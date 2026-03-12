@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UBI Services Limited – Phone Directory</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+<!-- docx for Word export -->
+<script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
+<style>
+:root[data-theme="light"]{
+  --bg:#f0f2f7;--surface:#fff;--surface2:#f5f7fb;--border:#dde2ee;
+  --accent:#1a56e8;--as:rgba(26,86,232,.08);
+  --text:#1a1d2e;--muted:#7a82a0;--danger:#e53e5a;
+  --rh:rgba(26,86,232,.035);--sh:0 2px 12px rgba(26,86,232,.07);
+  --shl:0 8px 32px rgba(26,86,232,.12);--grid:rgba(26,86,232,.04);
+  --it:#0ea5e9;--its:rgba(14,165,233,.1);
+}
+:root[data-theme="dark"]{
+  --bg:#0f0f13;--surface:#17171e;--surface2:#1e1e28;--border:#2a2a38;
+  --accent:#00e5a0;--as:rgba(0,229,160,.08);
+  --text:#e8e8f0;--muted:#6b6b85;--danger:#ff4d6d;
+  --rh:rgba(0,229,160,.04);--sh:0 2px 12px rgba(0,0,0,.3);
+  --shl:0 8px 32px rgba(0,0,0,.5);--grid:rgba(255,255,255,.03);
+  --it:#00b8ff;--its:rgba(0,184,255,.1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .3s,color .3s}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+.wrap{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:1.4rem 1.2rem}
+
+/* HEADER */
+header{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:1.2rem 1.6rem;margin-bottom:1rem;box-shadow:var(--sh);display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:.9rem}
+.logo-slot{width:50px;height:50px;border-radius:12px;border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;transition:border-color .2s;flex-shrink:0;position:relative;background:var(--surface2)}
+.logo-slot:hover{border-color:var(--accent)}
+.logo-slot img{width:100%;height:100%;object-fit:contain}
+.logo-slot input{display:none}
+.lh{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:var(--muted)}
+.brand-text h1{font-size:1.15rem;font-weight:700;letter-spacing:-.02em;line-height:1.2}
+.brand-text .sub{font-size:.67rem;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em}
+.hdr-r{display:flex;align-items:center;gap:.65rem;flex-wrap:wrap}
+.upd{display:flex;align-items:center;gap:.38rem;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:.28rem .72rem;font-size:.7rem;color:var(--muted);font-family:'DM Mono',monospace;white-space:nowrap}
+.upd-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;flex-shrink:0}
+.tot{display:flex;flex-direction:column;align-items:flex-end}
+.tot .n{font-size:1.65rem;font-weight:700;color:var(--accent);line-height:1;font-family:'DM Mono',monospace}
+.tot .l{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.thm{background:var(--surface2);border:1px solid var(--border);border-radius:50px;padding:.3rem .72rem;cursor:pointer;font-size:.75rem;color:var(--muted);display:flex;align-items:center;gap:.38rem;transition:all .2s;font-family:'Sora',sans-serif}
+.thm:hover{border-color:var(--accent);color:var(--accent)}
+
+/* TOOLBAR */
+.toolbar{display:flex;gap:.62rem;margin-bottom:.85rem;flex-wrap:wrap}
+.sw{flex:1;min-width:185px;position:relative}
+.sw input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.66rem 1rem .66rem 2.55rem;color:var(--text);font-family:'Sora',sans-serif;font-size:.86rem;outline:none;box-shadow:var(--sh);transition:border-color .2s,box-shadow .2s}
+.sw input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--as)}
+.sw input::placeholder{color:var(--muted)}
+.si{position:absolute;left:.8rem;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+select.fs{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.66rem 1rem;color:var(--text);font-family:'Sora',sans-serif;font-size:.82rem;outline:none;cursor:pointer;box-shadow:var(--sh);transition:border-color .2s}
+select.fs:focus{border-color:var(--accent)}
+.btn{padding:.66rem 1.05rem;border-radius:10px;border:none;cursor:pointer;font-family:'Sora',sans-serif;font-size:.82rem;font-weight:600;transition:all .2s;display:flex;align-items:center;gap:.38rem;white-space:nowrap}
+.bp{background:var(--accent);color:#fff;box-shadow:var(--sh)}
+.bp:hover{opacity:.9;transform:translateY(-1px)}
+.bo{background:var(--surface);color:var(--muted);border:1px solid var(--border);box-shadow:var(--sh)}
+.bo:hover{border-color:var(--accent);color:var(--accent)}
+.bit{background:var(--its);color:var(--it);border:1px solid color-mix(in srgb,var(--it) 30%,transparent);box-shadow:var(--sh)}
+.bit:hover{background:var(--it);color:#fff;transform:translateY(-1px)}
+
+/* ADMIN BAR */
+.adm-bar{display:none;background:linear-gradient(135deg,rgba(26,86,232,.08),rgba(14,165,233,.06));border:1px solid rgba(26,86,232,.2);border-radius:12px;padding:.6rem 1rem;margin-bottom:.85rem;gap:.6rem;align-items:center;flex-wrap:wrap}
+.adm-bar.visible{display:flex}
+.adm-label{font-size:.72rem;font-family:'DM Mono',monospace;color:var(--accent);font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-right:.3rem;display:flex;align-items:center;gap:.4rem}
+.adm-label::before{content:'⚙️'}
+:root[data-theme="dark"] .adm-bar{background:linear-gradient(135deg,rgba(0,229,160,.07),rgba(0,184,255,.05));border-color:rgba(0,229,160,.2)}
+
+/* STATS */
+.stats{display:flex;gap:.52rem;margin-bottom:.85rem;flex-wrap:wrap;align-items:center}
+.chip{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.3rem .8rem;font-size:.72rem;color:var(--muted);font-family:'DM Mono',monospace;box-shadow:var(--sh)}
+.chip strong{color:var(--text)}
+
+/* TABLE */
+.tbl-w{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--shl)}
+table{width:100%;border-collapse:collapse}
+thead th{background:var(--surface2);padding:.75rem .95rem;text-align:left;font-size:.66rem;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);border-bottom:1px solid var(--border);cursor:pointer;user-select:none;transition:color .2s;white-space:nowrap}
+thead th:hover,thead th.sorted{color:var(--accent)}
+tbody tr{border-bottom:1px solid var(--border);transition:background .12s;animation:rIn .24s ease both}
+@keyframes rIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--rh)}
+td{padding:.65rem .95rem;font-size:.83rem;vertical-align:middle}
+
+/* SHARED PERSON CARDS */
+.person-list{display:flex;flex-direction:column;gap:.45rem}
+.pcard{display:flex;align-items:center;gap:.55rem;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:.42rem .6rem;transition:background .15s}
+.pcard:hover{border-color:var(--accent)}
+.av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.67rem;flex-shrink:0}
+.pname{font-weight:600;font-size:.81rem;line-height:1.2}
+.pmail{font-size:.66rem;color:var(--muted);font-family:'DM Mono',monospace}
+
+/* single person name cell */
+.nc{display:flex;align-items:center;gap:.6rem}
+.nm{font-weight:600;line-height:1.3}
+.em{font-size:.68rem;color:var(--muted);font-family:'DM Mono',monospace;margin-top:.1rem}
+
+.eb{display:inline-flex;align-items:center;background:var(--as);border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);color:var(--accent);border-radius:6px;padding:.16rem .5rem;font-family:'DM Mono',monospace;font-size:.79rem;font-weight:500;letter-spacing:.04em;white-space:nowrap}
+.sb-w{display:flex;flex-direction:column;gap:.3rem;align-items:flex-start}
+.shtag{font-size:.59rem;background:rgba(249,115,22,.12);color:#f97316;border:1px solid rgba(249,115,22,.25);border-radius:4px;padding:.07rem .32rem;font-family:'DM Mono',monospace;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.dp{display:inline-block;padding:.16rem .5rem;border-radius:20px;font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.ab{display:flex;gap:.3rem}
+.ib{width:27px;height:27px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.77rem;transition:all .15s}
+.ib:hover{border-color:var(--accent);color:var(--accent);background:var(--as)}
+.ib.dl:hover{border-color:var(--danger);color:var(--danger);background:rgba(229,62,90,.08)}
+.empty{text-align:center;padding:4rem 2rem;color:var(--muted)}
+.empty .ei{font-size:2.5rem;margin-bottom:.7rem}
+
+/* MODAL */
+.mb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);z-index:100;align-items:center;justify-content:center;padding:1rem}
+.mb.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:1.75rem;width:100%;max-width:480px;animation:mIn .22s ease;box-shadow:var(--shl);max-height:90vh;overflow-y:auto}
+@keyframes mIn{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal h2{font-size:1.07rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:.5rem}
+.tag{font-size:.66rem;background:var(--as);color:var(--accent);padding:.13rem .48rem;border-radius:20px;font-family:'DM Mono',monospace;font-weight:400}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:.82rem;margin-bottom:1.25rem}
+.ff{display:flex;flex-direction:column;gap:.32rem}
+.ff.full{grid-column:1/-1}
+.ff label{font-size:.66rem;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.ff input,.ff select,.ff textarea{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:.57rem .77rem;color:var(--text);font-family:'Sora',sans-serif;font-size:.84rem;outline:none;transition:border-color .2s,box-shadow .2s;resize:vertical}
+.ff input:focus,.ff select:focus,.ff textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--as)}
+.ma{display:flex;justify-content:flex-end;gap:.6rem;flex-wrap:wrap}
+
+/* IT modal */
+.it-info{background:var(--its);border:1px solid color-mix(in srgb,var(--it) 25%,transparent);border-radius:10px;padding:.82rem .95rem;margin-bottom:1.15rem;font-size:.8rem;color:var(--it);line-height:1.6}
+.it-info strong{display:block;margin-bottom:.18rem;font-size:.86rem}
+.copy-box{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.9rem;font-size:.8rem;font-family:'DM Mono',monospace;white-space:pre-wrap;word-break:break-word;margin-bottom:1rem;line-height:1.7;color:var(--text);max-height:160px;overflow-y:auto}
+
+/* IMPORT/EXPORT PANEL */
+.ie-grid{display:grid;grid-template-columns:1fr 1fr;gap:.85rem;margin-bottom:1.25rem}
+.ie-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:1.1rem;display:flex;flex-direction:column;gap:.7rem;align-items:center;text-align:center}
+.ie-card .ic{font-size:1.8rem}
+.ie-card h3{font-size:.88rem;font-weight:700}
+.ie-card p{font-size:.75rem;color:var(--muted);line-height:1.5}
+.file-drop{border:2px dashed var(--border);border-radius:10px;padding:1.2rem;text-align:center;cursor:pointer;transition:all .2s;font-size:.8rem;color:var(--muted)}
+.file-drop:hover{border-color:var(--accent);color:var(--accent);background:var(--as)}
+.file-drop input{display:none}
+
+/* LOCKOUT banner */
+.lockout-bar{background:rgba(229,62,90,.12);border:1px solid rgba(229,62,90,.3);border-radius:10px;padding:.7rem 1rem;font-size:.8rem;color:var(--danger);text-align:center;margin-bottom:.8rem;display:none}
+
+/* PIN */
+.pd{display:flex;gap:.68rem;justify-content:center;margin:1.15rem 0}
+.pdot{width:13px;height:13px;border-radius:50%;border:2px solid var(--border);transition:all .2s}
+.pdot.f{background:var(--accent);border-color:var(--accent)}
+.np{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem}
+.nb{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.8rem;color:var(--text);font-family:'Sora',sans-serif;font-size:.98rem;font-weight:600;cursor:pointer;transition:all .15s}
+.nb:hover{border-color:var(--accent);color:var(--accent)}
+.nb.db{font-size:.77rem;color:var(--muted)}
+.nb.eb2{background:var(--accent);color:#fff;border-color:var(--accent)}
+.nb.eb2:hover{opacity:.9}
+.pe{color:var(--danger);text-align:center;font-size:.77rem;min-height:1.05rem}
+.att{font-size:.72rem;color:var(--muted);text-align:center;margin-top:.5rem}
+
+/* TOAST */
+.tw{position:fixed;bottom:1.15rem;right:1.15rem;z-index:200;display:flex;flex-direction:column;gap:.38rem}
+.toast{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.6rem 1.05rem;font-size:.8rem;display:flex;align-items:center;gap:.42rem;animation:tIn .24s ease;box-shadow:var(--shl)}
+@keyframes tIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+.toast.s{border-color:color-mix(in srgb,var(--accent) 35%,transparent)}
+.toast.s::before{content:'✓';color:var(--accent);font-weight:700}
+.toast.e{border-color:rgba(229,62,90,.35)}
+.toast.e::before{content:'✗';color:var(--danger);font-weight:700}
+.toast.i{border-color:color-mix(in srgb,var(--it) 30%,transparent)}
+.toast.i::before{content:'ℹ';color:var(--it);font-weight:700}
+
+/* SECRET HINT — invisible, for dev reference only */
+.sec-hint{position:fixed;bottom:.4rem;left:50%;transform:translateX(-50%);font-size:.55rem;color:transparent;user-select:none;pointer-events:none}
+
+@media(max-width:640px){
+  .fg,.ie-grid{grid-template-columns:1fr}.ff.full{grid-column:auto}
+  td:nth-child(4),th:nth-child(4),td:nth-child(5),th:nth-child(5){display:none}
+  .tot{display:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <div class="logo-slot" onclick="document.getElementById('lf').click()" title="Click to upload logo">
+        <input type="file" id="lf" accept="image/*" onchange="handleLogo(event)">
+        <img id="li" src="" style="display:none">
+        <div class="lh" id="lhint">🏢</div>
+      </div>
+      <div class="brand-text">
+        <h1>UBI Services Limited</h1>
+        <span class="sub">504-506, 5th Floor · Centrum, Thane · Internal Directory</span>
+      </div>
+    </div>
+    <div class="hdr-r">
+      <div class="upd"><span class="upd-dot" id="syncDot"></span>Last updated:&nbsp;<strong id="updLbl">—</strong>&nbsp;<span id="syncLbl" style="color:var(--accent);font-weight:600">Loading…</span></div>
+      <div class="tot"><span class="n" id="totC">0</span><span class="l">entries</span></div>
+      <button class="thm" onclick="toggleTheme()" id="thBtn">🌙 Dark</button>
+    </div>
+  </header>
+
+  <div class="lockout-bar" id="lockoutBar"></div>
+
+  <div class="toolbar">
+    <div class="sw"><span class="si">🔍</span>
+      <input type="text" id="q" placeholder="Search name, extension, department, role…" oninput="render()">
+    </div>
+    <select class="fs" id="df" onchange="render()"><option value="">All Departments</option></select>
+    <button class="btn bit" onclick="openIT()">🖥️ Request IT Change</button>
+    <!-- NO visible admin button — type "ADMIN" anywhere to open -->
+  </div>
+
+  <!-- ADMIN BAR — visible only when logged in -->
+  <div class="adm-bar" id="admBar">
+    <span class="adm-label">Admin Mode</span>
+    <button class="btn bp" style="padding:.45rem .9rem;font-size:.78rem" onclick="openAdd()">➕ Add Person</button>
+    <button class="btn bo" style="padding:.45rem .9rem;font-size:.78rem" onclick="openM('admPanelM')">⚙️ Admin Panel</button>
+    <button class="btn bo" style="padding:.45rem .9rem;font-size:.78rem;color:var(--danger);border-color:var(--danger);margin-left:auto" onclick="logOut()">🚪 Logout</button>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="tbl-w">
+    <table>
+      <thead><tr>
+        <th onclick="sortBy('name')">Name <span id="sn">↕</span></th>
+        <th onclick="sortBy('ext')">Extension <span id="se">↕</span></th>
+        <th onclick="sortBy('dept')">Department <span id="sd">↕</span></th>
+        <th onclick="sortBy('role')">Designation <span id="sr">↕</span></th>
+        <th onclick="sortBy('location')">Location <span id="sl">↕</span></th>
+        <th id="ah" style="display:none">Actions</th>
+      </tr></thead>
+      <tbody id="tb"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SECRET HINT invisible -->
+<div class="sec-hint">type ADMIN to unlock</div>
+
+<!-- ═══ IT REQUEST MODAL ═══ -->
+<div class="mb" id="itM">
+  <div class="modal" style="max-width:520px">
+    <h2>🖥️ Request IT Change <span class="tag">SUBMIT</span></h2>
+    <div class="it-info"><strong>ℹ️ How this works</strong>Fill the form, then copy the generated request text and paste it into your email / WhatsApp / Teams message to IT.</div>
+    <div class="fg">
+      <div class="ff"><label>Your Name *</label><input type="text" id="itn" placeholder="e.g. Priya Mehta" oninput="buildITPreview()"></div>
+      <div class="ff"><label>Your Extension</label><input type="text" id="ite" placeholder="e.g. 119" oninput="buildITPreview()"></div>
+      <div class="ff full"><label>Type of Change *</label>
+        <select id="itt" onchange="buildITPreview()">
+          <option value="">— Select —</option>
+          <option>Add new person</option>
+          <option>Remove person</option>
+          <option>Change extension number</option>
+          <option>Change designation / role</option>
+          <option>Change department</option>
+          <option>Add / change shared extension</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="ff full"><label>Details *</label><textarea id="itd" rows="3" placeholder="Describe exactly what needs to be changed…" oninput="buildITPreview()"></textarea></div>
+    </div>
+    <div class="ff full" style="margin-bottom:1rem">
+      <label>📋 Generated Request — Copy & send to IT</label>
+      <div class="copy-box" id="itPreview">Fill the form above to generate request text…</div>
+    </div>
+    <div class="ma">
+      <button class="btn bo" onclick="closeM('itM')">Cancel</button>
+      <button class="btn bit" onclick="copyIT()">📋 Copy Request Text</button>
+      <button class="btn bit" onclick="waIT()" style="background:rgba(37,211,102,.15);color:#25d366;border-color:rgba(37,211,102,.3)">💬 WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PIN MODAL ═══ -->
+<div class="mb" id="pinM">
+  <div class="modal" style="max-width:308px;text-align:center">
+    <h2 style="justify-content:center">🔐 Admin Access</h2>
+    <p style="color:var(--muted);font-size:.78rem">Enter 4-digit PIN</p>
+    <div class="pd">
+      <div class="pdot" id="p0"></div><div class="pdot" id="p1"></div>
+      <div class="pdot" id="p2"></div><div class="pdot" id="p3"></div>
+    </div>
+    <p class="pe" id="pe2txt"></p>
+    <div class="np">
+      <button class="nb" onclick="pp('1')">1</button><button class="nb" onclick="pp('2')">2</button><button class="nb" onclick="pp('3')">3</button>
+      <button class="nb" onclick="pp('4')">4</button><button class="nb" onclick="pp('5')">5</button><button class="nb" onclick="pp('6')">6</button>
+      <button class="nb" onclick="pp('7')">7</button><button class="nb" onclick="pp('8')">8</button><button class="nb" onclick="pp('9')">9</button>
+      <button class="nb db" onclick="pdel()">⌫</button><button class="nb" onclick="pp('0')">0</button><button class="nb eb2" onclick="pcheck()">OK</button>
+    </div>
+    <p class="att" id="attTxt"></p>
+    <br>
+    <button class="btn bo" style="width:100%" onclick="closeM('pinM')">Cancel</button>
+  </div>
+</div>
+
+<!-- ═══ ADMIN PANEL (after login) ═══ -->
+<div class="mb" id="admPanelM">
+  <div class="modal" style="max-width:400px">
+    <h2>⚙️ Admin Panel <span class="tag">ADMIN</span></h2>
+    <div class="ie-grid">
+      <div class="ie-card">
+        <div class="ic">📤</div>
+        <h3>Export</h3>
+        <p>Download current directory as a formatted Word (.docx) file</p>
+        <button class="btn bp" style="width:100%" onclick="exportDocx()">Export .docx</button>
+      </div>
+      <div class="ie-card">
+        <div class="ic">📥</div>
+        <h3>Import</h3>
+        <p>Upload a previously exported JSON file to replace directory data</p>
+        <div class="file-drop" onclick="document.getElementById('importFile').click()">
+          <input type="file" id="importFile" accept=".json" onchange="importJSON(event)">
+          📂 Click to upload JSON
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:.6rem">
+      <button class="btn bp" style="width:100%" onclick="closeM('admPanelM');openAdd()">➕ Add New Person</button>
+      <button class="btn bo" style="width:100%" onclick="exportJSON()">💾 Export Raw JSON (for re-import)</button>
+      <button class="btn bo" style="width:100%;color:var(--danger);border-color:var(--danger)" onclick="logOut()">🚪 Logout Admin</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ADD/EDIT MODAL ═══ -->
+<div class="mb" id="fM">
+  <div class="modal">
+    <h2 id="fT">Add Person <span class="tag">NEW</span></h2>
+    <div class="fg">
+      <div class="ff full">
+        <label>Name(s) — use / to separate shared users *</label>
+        <input type="text" id="fn" placeholder="e.g. Ashish / Prathamesh  or  Poonam / Ruchita / Jayshree">
+      </div>
+      <div class="ff"><label>Extension *</label><input type="text" id="fe" placeholder="e.g. 212" maxlength="8"></div>
+      <div class="ff"><label>Department *</label><input type="text" id="fd" placeholder="e.g. HR" list="dL"><datalist id="dL"></datalist></div>
+      <div class="ff full"><label>Designation / Role</label><input type="text" id="fr" placeholder="e.g. CRM Executive"></div>
+      <div class="ff full">
+        <label>Email(s) — use / to match names above (auto-generated if blank)</label>
+        <input type="text" id="fem" placeholder="e.g. ashish@ubisl.co.in / prathamesh@ubisl.co.in">
+      </div>
+      <div class="ff full" style="flex-direction:row;align-items:center;gap:.5rem;padding:.3rem 0">
+        <input type="checkbox" id="fnoem" style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer">
+        <label for="fnoem" style="font-size:.8rem;color:var(--muted);text-transform:none;letter-spacing:0;cursor:pointer">No email (e.g. meeting room, pantry, facility)</label>
+      </div>
+      <div class="ff full"><label>Location / Floor</label><input type="text" id="fl" placeholder="5th Floor"></div>
+    </div>
+    <div class="ma">
+      <button class="btn bo" onclick="closeM('fM')">Cancel</button>
+      <button class="btn bp" onclick="saveE()">Save Entry</button>
+    </div>
+  </div>
+</div>
+
+<div class="tw" id="tw"></div>
+
+<script>
+// ═══════════════ CONFIG ═══════════════
+const PIN='1234';           // ← Change this PIN!
+const IT_WA='919999999999'; // ← WhatsApp number for IT (with country code, no +)
+const LOC='5th Floor';
+const DOM='ubisl.co.in';
+const SK='ubi_v5';
+const MAX_ATT=3;
+const LOCKOUT_MS=5*60*1000; // 5 min
+
+// ═══════════════ DEPT COLORS ═══════════════
+const DC={
+  'Head Office':['#1a56e8','#e8edfb'],
+  'IT':['#0ea5e9','#e0f4fd'],
+  'AVP':['#7c3aed','#ede9ff'],
+  'HR':['#e53e5a','#fde8ec'],
+  'Account':['#d97706','#fef3e0'],
+  'MIS':['#059669','#d1fae5'],
+  'Admin':['#64748b','#f1f5f9'],
+  'Education Loan':['#0891b2','#e0f7fa'],
+  'Empanelment & CRM Team':['#9333ea','#f3e8ff'],
+  'Pantry':['#b45309','#fef3c7'],
+  'Internal Control & Compliance':['#be185d','#fce7f3'],
+};
+const AV=[['#1a56e8','#dbeafe'],['#0ea5e9','#e0f2fe'],['#7c3aed','#ede9fe'],['#e53e5a','#fee2e2'],['#d97706','#fef3c7'],['#059669','#d1fae5']];
+
+function dS(d){const c=DC[d]||['#6b6b85','#f0f0f5'],dk=isDark();return dk?`background:${c[0]}22;color:${c[0]};border:1px solid ${c[0]}44;`:`background:${c[1]};color:${c[0]};border:1px solid ${c[0]}44;`}
+function aS(n){let h=0;for(const c of n)h=(h*31+c.charCodeAt(0))&0xffffffff;const[fg,bg]=AV[Math.abs(h)%AV.length];const dk=isDark();return dk?`background:${fg}22;color:${fg};`:`background:${bg};color:${fg};`}
+function isDark(){return document.documentElement.getAttribute('data-theme')==='dark'}
+
+// per-name email helpers
+function autoEmail(name){
+  const p=name.trim().split(/\s+/);
+  const a=p[0].toLowerCase().replace(/[^a-z]/g,'');
+  const b=(p[1]||'').toLowerCase().replace(/[^a-z]/g,'');
+  return b?`${a}.${b}@${DOM}`:`${a}@${DOM}`;
+}
+function getEmails(entry){
+  if(entry.noEmail) return [];
+  return entry.emails&&entry.emails.length?entry.emails:entry.persons.map(n=>autoEmail(n));
+}
+
+// ═══════════════ DEFAULT DATA ═══════════════
+function defData(){const D=LOC;
+  function mk(id,names,ext,dept,role,location,emails,noEmail){
+    const persons=names.split('/').map(s=>s.trim());
+    const em=noEmail?[]:emails?emails.split('/').map(s=>s.trim()):persons.map(n=>autoEmail(n));
+    return{id,persons,ext,dept,role,location:location||D,emails:em,noEmail:!!noEmail};
+  }
+  return[
+  mk(1,'Vrushali Salunke','101/9','Head Office','Front Desk & Sr. Admin Executive'),
+  mk(2,'Sanjay Rajoria','131','Head Office','MD & CEO'),
+  mk(3,'Dattatraya Bhosale','125','Head Office','CFO'),
+  mk(4,'Priyesh Haridas','132','Head Office','CBO'),
+  mk(5,'Ashutosh Tipnis','111','Head Office','CPO'),
+  mk(6,'Nitesh Surve','133','Head Office','COO'),
+  mk(7,'Swapnaja Mathure','177','Head Office','VP – HR'),
+  mk(8,'Dhananjay Kamble','150','Head Office','VP IT'),
+  mk(9,'Ricky Dawda','134','Head Office','VP – Risk'),
+  mk(10,'Jalpa Phansalkar','109','Head Office','Head – Internal Control'),
+  mk(11,'Komal Pawar','103','Head Office','EA to MD & CEO'),
+  mk(12,'Sanjay Kurseja','106','Head Office','Asst. Company Secretary'),
+  mk(13,'Siddhartha Vaidya','181','Head Office','Associate – Secretarial'),
+  mk(14,'Kuldeep Awasthi','108','Internal Control & Compliance','Compliance Head'),
+  mk(15,'Mahesh Rasal / Mansi Salunkhe','152','Internal Control & Compliance','Compliance Manager / Executive'),
+  mk(16,'Akash Dama / Sanjana Sawant','123','Internal Control & Compliance','Management Trainee / Executive'),
+  mk(17,'Sheetal Dhaybar','144','Internal Control & Compliance','Senior Executive'),
+  mk(18,'Ashish','149','IT','Manager – IT'),
+  mk(19,'Vinay Bhekare / Sachin Yadav','104/199','IT','IT Executive'),
+  mk(20,'Pratik Shelke','143','IT','Executive'),
+  mk(21,'Aditi Chavan','189','IT','Executive'),
+  mk(22,'Tushar Sable','110','AVP','AVP – Education Loan'),
+  mk(23,'Gauravi Sarkarte / Sanket','171','AVP','AVP Risk / Executive'),
+  mk(24,'Darshak Shah / Abhishek','105','AVP','AVP – Accounts / Executive'),
+  mk(25,'Gaurav Bamania','120','AVP','AVP – HR'),
+  mk(26,'Suchita Gaikwad','122','HR','HR Operation Manager'),
+  mk(27,'Abha / Prerna','119','HR','HR – Executive'),
+  mk(28,'Prathamesh / Nupur','115','HR','Payroll Executive'),
+  mk(29,'Pranjali / Akansha Chundawat','166','HR','Asst. Manager / HR Executive'),
+  mk(30,'Balaji Dhore / Rahul Nakte','117','HR','HR Compliance'),
+  mk(31,'Tejasvi Gholap','172','HR','HR Executive'),
+  mk(32,'Sayli / Shraddha Gujar','118','HR','Senior Manager / Asst. Manager'),
+  mk(33,'Snehal Tambe / Sonam','116','HR','Asst. Manager (Payroll) / Executive'),
+  mk(34,'Alister Fernandez','138','HR','Senior Executive'),
+  mk(35,'Sachita Nambiar / Sanjana Tiwari','121','HR','Senior Manager / Executive'),
+  mk(36,'Sagar Chotaliya / Nilakshi','137','Account','Asst. Manager / Sr. Executive'),
+  mk(37,'Yash Vora / Jinesh','139','Account','Senior Manager'),
+  mk(38,'Abhishek Shirtavle / Darshana Raut','105','Account','Sr. Executive / Executive'),
+  mk(39,'Chaitali / Shefali','127','Account','Asst. Manager / Executive'),
+  mk(40,'Kiran Mansukhani / Vikas Rawlo','130','MIS','Sr. Manager (MIS) / Analytics'),
+  mk(41,'Ankita Sawant / Akansha','113','MIS','MIS Executive'),
+  mk(42,'Martin Anandas','188','Admin','Asst. Manager'),
+  mk(43,'Aniket Jadhav','101','Admin','Admin Executive'),
+  mk(44,'Sejal Nagtilak / Manali','129','Education Loan','Manager / Senior Executive'),
+  mk(45,'Pranesh Narkar / Siddhi Konde','112','Education Loan','Senior Executive'),
+  mk(46,'Nandini Kondale','202','Empanelment & CRM Team','Business Co-ordinator'),
+  mk(47,'Swati Agarwal','201','Empanelment & CRM Team','Manager Empanelment'),
+  mk(48,'Piyush Aukirkar / Raj Jaiswar','201','Empanelment & CRM Team','Lead CRM / Sr. Executive'),
+  mk(49,'Madhuri','124','Empanelment & CRM Team','Asst. Manager CRM'),
+  mk(50,'Supriya / Sakshi','211','Empanelment & CRM Team','Sr. Operation Executive'),
+  mk(51,'Ashish / Prathamesh','212','Empanelment & CRM Team','CRM Executive'),
+  mk(52,'Poonam / Ruchita / Jayshree','214','Empanelment & CRM Team','Sr. Executive / Asst. Manager / Sr. Executive'),
+  mk(53,'Anita / Shailendra','216','Empanelment & CRM Team','Sr. Operation Executive / Operation Executive'),
+  mk(54,'Pratiksha','217','Empanelment & CRM Team','Voice Executive'),
+  mk(55,'Prem More / Ganesh / Akshay','135','Pantry','Sub – Staff'),
+  mk(56,'Omkar / Love Bavge','200','Pantry','Sub – Staff (6th Floor)',null,'6th Floor'),
+  mk(57,'Meeting Room (Near Front Desk)','187','Admin','Meeting Room',null,null,true),
+  mk(58,'Big Conference Room','142','Admin','Conference Room',null,null,true),
+];}
+
+// ═══════════════ STATE ═══════════════
+let data=[],editIdx=-1,isAdm=false,sCol='dept',sDir=1,lastUpd=null;
+let attempts=0,lockedUntil=0;
+
+// ── backend path (same folder as this HTML file on the NAS) ──
+const API='save.php';
+
+// ── detect if running on a real server or just opened as a local file ──
+const IS_SERVER = window.location.protocol === 'http:' || window.location.protocol === 'https:';
+
+// ── PIN lockout lives in localStorage only (per-browser, intentional) ──
+function loadLocal(){
+  try{const s=localStorage.getItem(SK);if(s){const p=JSON.parse(s);attempts=p.attempts||0;lockedUntil=p.lockedUntil||0;}}catch{}
+}
+function saveLocal(){localStorage.setItem(SK,JSON.stringify({attempts,lockedUntil}));}
+
+// ── localStorage fallback (for local file:// usage) ──
+function loadFromLocal(){
+  try{
+    const s=localStorage.getItem(SK+'_data');
+    if(s){const p=JSON.parse(s);data=p.data||defData();lastUpd=p.updated||null;}
+    else{data=defData();lastUpd=new Date().toISOString();saveDataLocal();}
+  }catch{data=defData();}
+}
+function saveDataLocal(){
+  localStorage.setItem(SK+'_data',JSON.stringify({data,updated:lastUpd}));
+}
+
+// ── load data ──────────────────────────────────────────────────────────────
+async function load(){
+  loadLocal();
+  if(!IS_SERVER){
+    // Running as local file — use localStorage
+    setSyncStatus('offline');
+    toast('ℹ️ Running locally — changes save to this browser only.','i');
+    loadFromLocal();
+    showUpd();
+    render();
+    return;
+  }
+  // Running on server — fetch from save.php
+  setSyncStatus('loading');
+  try{
+    const r=await fetch(API+'?t='+Date.now());
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const json=await r.json();
+    if(json.data&&Array.isArray(json.data)){
+      data=json.data;
+      lastUpd=json.updated||null;
+    } else if(Array.isArray(json)&&json.length>0){
+      data=json;
+    } else {
+      // Server has empty data.json — seed with defaults and save
+      data=defData();
+      await persistToServer();
+    }
+    setSyncStatus('ok');
+  }catch(e){
+    console.warn('Could not reach save.php, falling back to localStorage.',e);
+    loadFromLocal();
+    setSyncStatus('offline');
+    toast('⚠️ Could not connect to server. Changes will only save locally.','e');
+  }
+  showUpd();
+  render();
+}
+
+// ── save data ──────────────────────────────────────────────────────────────
+async function persist(){
+  lastUpd=new Date().toISOString();
+  showUpd();
+  if(!IS_SERVER){
+    saveDataLocal();
+    return;
+  }
+  setSyncStatus('saving');
+  await persistToServer();
+}
+
+async function persistToServer(){
+  try{
+    const r=await fetch(API,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({data,updated:lastUpd})
+    });
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    setSyncStatus('ok');
+  }catch(e){
+    console.error('Save failed',e);
+    setSyncStatus('error');
+    toast('❌ Save failed — check server connection.','e');
+  }
+}
+
+// ── sync status dot in header ──
+function setSyncStatus(state){
+  const dot=document.getElementById('syncDot');
+  const lbl=document.getElementById('syncLbl');
+  if(!dot)return;
+  const map={
+    loading:['#f59e0b','Loading…'],
+    saving: ['#f59e0b','Saving…'],
+    ok:     ['#22c55e','● Live'],
+    offline:['#94a3b8','○ Local only'],
+    error:  ['#ef4444','⚠ Save error'],
+  };
+  const[color,text]=map[state]||['#94a3b8','—'];
+  dot.style.background=color;
+  lbl.textContent=text;
+  lbl.style.color=color;
+}
+
+function showUpd(){
+  const el=document.getElementById('updLbl');
+  if(!lastUpd){el.textContent='—';return;}
+  const d=new Date(lastUpd);
+  el.textContent=d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})+' '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+}
+
+// ═══════════════ RENDER ═══════════════
+function render(){
+  const q=document.getElementById('q').value.toLowerCase().trim();
+  const df=document.getElementById('df').value;
+  let rows=data.filter(p=>{
+    const f=`${p.persons.join(' ')} ${p.ext} ${p.dept} ${p.role} ${p.location} ${(p.emails||[]).join(' ')}`.toLowerCase();
+    return(!q||f.includes(q))&&(!df||p.dept===df);
+  });
+  rows.sort((a,b)=>{
+    const av=(sCol==='name'?a.persons[0]:(a[sCol]||'')).toLowerCase();
+    const bv=(sCol==='name'?b.persons[0]:(b[sCol]||'')).toLowerCase();
+    return av<bv?-sDir:av>bv?sDir:0;
+  });
+  const tb=document.getElementById('tb');
+  if(!rows.length){tb.innerHTML=`<tr><td colspan="6"><div class="empty"><div class="ei">📭</div><p>No entries found.</p></div></td></tr>`;return;}
+
+  tb.innerHTML=rows.map((p,i)=>{
+    const shared=p.persons.length>1;
+    const emails=getEmails(p);
+    const delay=Math.min(i*.02,.3);
+
+    // Name cell
+    let nameCell;
+    if(shared){
+      const cards=p.persons.map((name,j)=>{
+        const ini=name.split(' ').map(w=>w[0]||'').slice(0,2).join('').toUpperCase();
+        const em=emails[j]||'';
+        return`<div class="pcard">
+          <div class="av" style="${aS(name)}">${ini}</div>
+          <div><div class="pname">${name}</div>${em?`<div class="pmail">${em}</div>`:''}</div>
+        </div>`;
+      }).join('');
+      nameCell=`<div class="person-list">${cards}</div>`;
+    }else{
+      const ini=p.persons[0].split(' ').map(w=>w[0]||'').slice(0,2).join('').toUpperCase();
+      const em0=emails[0]||'';
+      nameCell=`<div class="nc">
+        <div class="av" style="${aS(p.persons[0])}">${ini}</div>
+        <div><div class="nm">${p.persons[0]}</div>${em0?`<div class="em">${em0}</div>`:''}</div>
+      </div>`;
+    }
+
+    // Ext cell
+    const extCell=shared
+      ?`<div class="sb-w"><span class="eb">📞 ${p.ext}</span><span class="shtag">shared × ${p.persons.length}</span></div>`
+      :`<span class="eb">📞 ${p.ext}</span>`;
+
+    const actCell=isAdm
+      ?`<td><div class="ab"><button class="ib" onclick="editE(${data.indexOf(p)})">✏️</button><button class="ib dl" onclick="delE(${data.indexOf(p)})">🗑️</button></div></td>`
+      :'<td></td>';
+
+    return`<tr style="animation-delay:${delay}s">
+      <td>${nameCell}</td>
+      <td>${extCell}</td>
+      <td><span class="dp" style="${dS(p.dept)}">${p.dept}</span></td>
+      <td style="color:var(--muted);font-size:.79rem">${p.role||'—'}</td>
+      <td style="color:var(--muted);font-size:.79rem">${p.location||LOC}</td>
+      ${actCell}
+    </tr>`;
+  }).join('');
+
+  document.getElementById('totC').textContent=data.length;
+  updDept();
+  const sh=data.filter(p=>p.persons.length>1).length;
+  const depts=[...new Set(data.map(p=>p.dept))].length;
+  document.getElementById('stats').innerHTML=`<div class="chip">Showing <strong>${rows.length}</strong> of <strong>${data.length}</strong></div><div class="chip">Departments: <strong>${depts}</strong></div><div class="chip">Shared phones: <strong>${sh}</strong></div>`;
+}
+
+function updDept(){
+  const sel=document.getElementById('df'),cur=sel.value;
+  const depts=[...new Set(data.map(p=>p.dept))].sort();
+  sel.innerHTML='<option value="">All Departments</option>'+depts.map(d=>`<option value="${d}"${cur===d?' selected':''}>${d}</option>`).join('');
+  document.getElementById('dL').innerHTML=depts.map(d=>`<option value="${d}">`).join('');
+}
+
+function sortBy(c){
+  if(sCol===c)sDir*=-1;else{sCol=c;sDir=1;}
+  document.querySelectorAll('thead th span').forEach(e=>e.textContent='↕');
+  document.querySelectorAll('thead th').forEach(e=>e.classList.remove('sorted'));
+  const icon=document.getElementById('s'+c[0]);
+  if(icon){icon.textContent=sDir===1?'↑':'↓';icon.parentElement.classList.add('sorted');}
+  render();
+}
+
+// ═══════════════ THEME ═══════════════
+function toggleTheme(){const h=document.documentElement,dk=isDark();h.setAttribute('data-theme',dk?'light':'dark');document.getElementById('thBtn').textContent=dk?'🌙 Dark':'☀️ Light';render();}
+
+// ═══════════════ LOGO ═══════════════
+function handleLogo(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{const i=document.getElementById('li');i.src=ev.target.result;i.style.display='block';document.getElementById('lhint').style.display='none';};r.readAsDataURL(f);}
+
+// ═══════════════ IT REQUEST ═══════════════
+function openIT(){['itn','ite','itd'].forEach(id=>document.getElementById(id).value='');document.getElementById('itt').value='';buildITPreview();openM('itM');}
+
+function buildITPreview(){
+  const n=document.getElementById('itn').value.trim();
+  const e=document.getElementById('ite').value.trim();
+  const t=document.getElementById('itt').value;
+  const d=document.getElementById('itd').value.trim();
+  if(!n&&!t&&!d){document.getElementById('itPreview').textContent='Fill the form above to generate request text…';return;}
+  const ts=new Date().toLocaleString('en-IN');
+  document.getElementById('itPreview').textContent=
+`📋 PHONE DIRECTORY CHANGE REQUEST
+${'─'.repeat(38)}
+From : ${n||'(not filled)'}  |  Ext: ${e||'N/A'}
+Type : ${t||'(not selected)'}
+Date : ${ts}
+
+Details:
+${d||'(not filled)'}
+${'─'.repeat(38)}
+Please update the directory accordingly.`;
+}
+
+function copyIT(){
+  const n=document.getElementById('itn').value.trim(),t=document.getElementById('itt').value,d=document.getElementById('itd').value.trim();
+  if(!n||!t||!d){toast('Please fill all required fields','e');return;}
+  const txt=document.getElementById('itPreview').textContent;
+  navigator.clipboard.writeText(txt).then(()=>{toast('Request text copied! Paste it in your email / chat.','i');}).catch(()=>{
+    // fallback: select text
+    const el=document.getElementById('itPreview');
+    const sel=window.getSelection();const range=document.createRange();range.selectNodeContents(el);sel.removeAllRanges();sel.addRange(range);
+    toast('Text selected — press Ctrl+C to copy','i');
+  });
+}
+
+function waIT(){
+  const n=document.getElementById('itn').value.trim(),t=document.getElementById('itt').value,d=document.getElementById('itd').value.trim();
+  if(!n||!t||!d){toast('Please fill all required fields first','e');return;}
+  const txt=document.getElementById('itPreview').textContent;
+  window.open(`https://wa.me/${IT_WA}?text=${encodeURIComponent(txt)}`,'_blank');
+}
+
+// ═══════════════ SECRET ADMIN UNLOCK ═══════════════
+// Type "ADMIN" anywhere (not in input fields) to open PIN modal
+let keyBuf='';
+const SECRET='ADMIN';
+document.addEventListener('keydown',e=>{
+  if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))return;
+  if(e.key==='Escape'){closeM('pinM');closeM('fM');closeM('itM');closeM('admPanelM');keyBuf='';return;}
+  if(e.key==='/'&&document.activeElement.tagName!=='INPUT'){e.preventDefault();document.getElementById('q').focus();return;}
+  // build secret buffer
+  if(e.key.length===1){keyBuf=(keyBuf+e.key.toUpperCase()).slice(-SECRET.length);}
+  if(keyBuf===SECRET){
+    keyBuf='';
+    if(isAdm){openM('admPanelM');}
+    else{checkLockout();if(!lockedOut())openM('pinM');}
+  }
+});
+
+function lockedOut(){return Date.now()<lockedUntil;}
+
+function checkLockout(){
+  if(lockedOut()){
+    const rem=Math.ceil((lockedUntil-Date.now())/1000);
+    const bar=document.getElementById('lockoutBar');
+    bar.style.display='block';
+    bar.textContent=`🔒 Admin locked after too many wrong attempts. Try again in ${rem}s.`;
+    setTimeout(()=>{if(!lockedOut())bar.style.display='none';},1000);
+    return;
+  }
+  document.getElementById('lockoutBar').style.display='none';
+}
+
+// ═══════════════ PIN ═══════════════
+let pb='';
+function pp(d){if(pb.length>=4||lockedOut())return;pb+=d;updPD();if(pb.length===4)setTimeout(pcheck,100);}
+function pdel(){pb=pb.slice(0,-1);updPD();}
+function updPD(){for(let i=0;i<4;i++)document.getElementById('p'+i).className='pdot'+(i<pb.length?' f':'');}
+
+function pcheck(){
+  if(lockedOut()){toast('Admin locked out. Try later.','e');return;}
+  if(pb===PIN){
+    attempts=0;lockedUntil=0;saveLocal();
+    isAdm=true;pb='';updPD();
+    document.getElementById('ah').style.display='';
+    document.getElementById('admBar').classList.add('visible');
+    render();closeM('pinM');openM('admPanelM');
+    document.getElementById('pe2txt').textContent='';
+    document.getElementById('attTxt').textContent='';
+    toast('Admin mode enabled','s');
+  }else{
+    attempts++;
+    pb='';updPD();
+    const rem=MAX_ATT-attempts;
+    if(attempts>=MAX_ATT){
+      lockedUntil=Date.now()+LOCKOUT_MS;saveLocal();
+      closeM('pinM');
+      document.getElementById('lockoutBar').style.display='block';
+      document.getElementById('lockoutBar').textContent=`🔒 Too many wrong attempts. Admin locked for 5 minutes.`;
+      toast('Too many failed attempts. Locked for 5 minutes.','e');
+    }else{
+      saveLocal();
+      document.getElementById('pe2txt').textContent=`Incorrect PIN.`;
+      document.getElementById('attTxt').textContent=`${rem} attempt${rem===1?'':'s'} remaining before lockout.`;
+    }
+  }
+}
+
+function logOut(){isAdm=false;document.getElementById('ah').style.display='none';document.getElementById('admBar').classList.remove('visible');render();closeM('admPanelM');toast('Logged out','s');}
+
+// ═══════════════ CRUD ═══════════════
+function openAdd(){
+  editIdx=-1;
+  document.getElementById('fT').innerHTML='Add Person <span class="tag">NEW</span>';
+  ['fn','fe','fd','fr','fem'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fl').value=LOC;
+  document.getElementById('fnoem').checked=false;
+  openM('fM');
+}
+
+function editE(i){
+  editIdx=i;const p=data[i];
+  document.getElementById('fT').innerHTML='Edit Entry <span class="tag">EDIT</span>';
+  document.getElementById('fn').value=p.persons.join(' / ');
+  document.getElementById('fe').value=p.ext||'';
+  document.getElementById('fd').value=p.dept||'';
+  document.getElementById('fr').value=p.role||'';
+  document.getElementById('fem').value=p.noEmail?'':(p.emails||[]).join(' / ');
+  document.getElementById('fl').value=p.location||LOC;
+  document.getElementById('fnoem').checked=!!p.noEmail;
+  openM('fM');
+}
+
+async function saveE(){
+  const namesRaw=document.getElementById('fn').value.trim();
+  const ext=document.getElementById('fe').value.trim();
+  const dept=document.getElementById('fd').value.trim();
+  if(!namesRaw||!ext||!dept){toast('Names, extension and department required','e');return;}
+  const persons=namesRaw.split('/').map(s=>s.trim()).filter(Boolean);
+  const noEmail=document.getElementById('fnoem').checked;
+  const emailsRaw=document.getElementById('fem').value.trim();
+  const emails=noEmail?[]:emailsRaw?emailsRaw.split('/').map(s=>s.trim()):persons.map(n=>autoEmail(n));
+  const entry={
+    id:editIdx===-1?Date.now():data[editIdx].id,
+    persons,ext,dept,
+    role:document.getElementById('fr').value.trim(),
+    emails,
+    noEmail,
+    location:document.getElementById('fl').value.trim()||LOC,
+  };
+  if(editIdx===-1){data.push(entry);toast(`${persons.join(' / ')} added`,'s');}
+  else{data[editIdx]=entry;toast(`${persons.join(' / ')} updated`,'s');}
+  closeM('fM');render();
+  await persist();
+}
+
+async function delE(i){
+  const p=data[i];
+  if(!confirm(`Remove "${p.persons.join(' / ')}" (Ext. ${p.ext})?`))return;
+  data.splice(i,1);render();toast(`Removed`,'s');
+  await persist();
+}
+
+// ═══════════════ IMPORT / EXPORT ═══════════════
+function exportJSON(){
+  const blob=new Blob([JSON.stringify({data,updated:lastUpd},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`ubi-directory-${new Date().toISOString().slice(0,10)}.json`;a.click();
+  toast('JSON exported','s');
+}
+
+function importJSON(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=async ev=>{
+    try{
+      const parsed=JSON.parse(ev.target.result);
+      const imported=parsed.data||parsed;
+      if(!Array.isArray(imported))throw new Error('Invalid format');
+      // Normalize old format (names string) to new (persons array)
+      data=imported.map(p=>{
+        if(!p.persons&&p.names)p.persons=p.names.split('/').map(s=>s.trim());
+        if(!p.emails)p.emails=p.noEmail?[]:p.persons.map(n=>autoEmail(n));
+        return p;
+      });
+      await persist();render();
+      toast(`Imported ${data.length} entries`,'s');
+      closeM('admPanelM');
+    }catch{toast('Invalid file. Please use an exported JSON file.','e');}
+  };
+  r.readAsText(f);
+  e.target.value='';
+}
+
+// ═══════════════ EXPORT DOCX ═══════════════
+async function exportDocx(){
+  toast('Generating Word document…','i');
+  try{
+    const {Document,Packer,Paragraph,TextRun,Table,TableRow,TableCell,
+           AlignmentType,BorderStyle,WidthType,ShadingType,VerticalAlign,HeadingLevel}=docx;
+
+    const border={style:BorderStyle.SINGLE,size:1,color:'CCCCCC'};
+    const borders={top:border,bottom:border,left:border,right:border};
+    const noBorder={style:BorderStyle.NONE,size:0,color:'FFFFFF'};
+    const noBorders={top:noBorder,bottom:noBorder,left:noBorder,right:noBorder};
+    const hdrShade={fill:'1A56E8',type:ShadingType.CLEAR};
+
+    // Group by department
+    const deptMap={};
+    data.forEach(p=>{if(!deptMap[p.dept])deptMap[p.dept]=[];deptMap[p.dept].push(p);});
+    const depts=Object.keys(deptMap).sort();
+
+    const children=[];
+
+    // Title
+    children.push(new Paragraph({
+      alignment:AlignmentType.CENTER,
+      spacing:{after:200},
+      children:[new TextRun({text:'UBI SERVICES LIMITED',bold:true,size:36,font:'Arial',color:'1A56E8'})],
+    }));
+    children.push(new Paragraph({
+      alignment:AlignmentType.CENTER,
+      spacing:{after:100},
+      children:[new TextRun({text:'Phone Extension Directory',size:26,font:'Arial',color:'444444'})],
+    }));
+    children.push(new Paragraph({
+      alignment:AlignmentType.CENTER,
+      spacing:{after:80},
+      children:[new TextRun({text:'504-506, 5th Floor, Centrum, S.G. Barve Road, Thane',size:18,font:'Arial',color:'888888'})],
+    }));
+    children.push(new Paragraph({
+      alignment:AlignmentType.CENTER,
+      spacing:{after:360},
+      children:[new TextRun({text:`Last Updated: ${lastUpd?new Date(lastUpd).toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'}):'—'}`,size:18,font:'Arial',color:'888888',italics:true})],
+    }));
+
+    // Table header row maker
+    function hdrRow(){
+      return new TableRow({
+        tableHeader:true,
+        children:[
+          mkCell('Name',2200,true),
+          mkCell('Extension',800,true),
+          mkCell('Department',1600,true),
+          mkCell('Designation',2400,true),
+          mkCell('Email',2000,true),
+          mkCell('Location',560,true),
+        ]
+      });
+    }
+
+    function mkCell(text,w,isHdr=false,shade=null){
+      return new TableCell({
+        borders,
+        width:{size:w,type:WidthType.DXA},
+        shading:isHdr?hdrShade:(shade||{fill:'FFFFFF',type:ShadingType.CLEAR}),
+        margins:{top:80,bottom:80,left:120,right:120},
+        verticalAlign:VerticalAlign.CENTER,
+        children:[new Paragraph({
+          children:[new TextRun({
+            text,
+            font:'Arial',
+            size:isHdr?18:17,
+            bold:isHdr,
+            color:isHdr?'FFFFFF':'222222',
+          })],
+        })],
+      });
+    }
+
+    const colWidths=[2200,800,1600,2400,2000,560];
+    const totalW=colWidths.reduce((a,b)=>a+b,0);
+
+    depts.forEach(dept=>{
+      // Dept heading row (merged)
+      children.push(new Paragraph({spacing:{before:200,after:60},children:[new TextRun({text:dept,bold:true,size:22,font:'Arial',color:'1A56E8'})]}));
+
+      const rows=[hdrRow()];
+      deptMap[dept].forEach((p,idx)=>{
+        const emails=getEmails(p);
+        const nameText=p.persons.join(' / ');
+        const emailText=emails.join(' / ');
+        const rowShade=idx%2===0?{fill:'F5F7FB',type:ShadingType.CLEAR}:{fill:'FFFFFF',type:ShadingType.CLEAR};
+        rows.push(new TableRow({
+          children:[
+            mkCell(nameText,colWidths[0],false,rowShade),
+            mkCell(p.ext,colWidths[1],false,rowShade),
+            mkCell(p.dept,colWidths[2],false,rowShade),
+            mkCell(p.role||'—',colWidths[3],false,rowShade),
+            mkCell(emailText,colWidths[4],false,rowShade),
+            mkCell(p.location||LOC,colWidths[5],false,rowShade),
+          ]
+        }));
+      });
+
+      children.push(new Table({
+        width:{size:totalW,type:WidthType.DXA},
+        columnWidths:colWidths,
+        rows,
+      }));
+      children.push(new Paragraph({spacing:{after:120},children:[new TextRun({text:''})]}));
+    });
+
+    // Footer note
+    children.push(new Paragraph({
+      alignment:AlignmentType.CENTER,
+      spacing:{before:400},
+      children:[new TextRun({text:'This is a confidential internal document. For IT changes contact: it@ubisl.co.in',size:16,font:'Arial',color:'AAAAAA',italics:true})],
+    }));
+
+    const doc=new Document({
+      styles:{default:{document:{run:{font:'Arial',size:18}}}},
+      sections:[{
+        properties:{page:{size:{width:12240,height:15840},margin:{top:900,right:900,bottom:900,left:900}}},
+        children,
+      }]
+    });
+
+    const blob=await Packer.toBlob(doc);
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download=`UBI-Directory-${new Date().toISOString().slice(0,10)}.docx`;a.click();
+    toast('Word document exported!','s');
+  }catch(err){
+    console.error(err);
+    toast('Export failed. Check console for details.','e');
+  }
+}
+
+// ═══════════════ MODAL HELPERS ═══════════════
+function openM(id){document.getElementById(id).classList.add('open');}
+function closeM(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.mb').forEach(b=>b.addEventListener('click',e=>{if(e.target===b)closeM(b.id);}));
+
+// ═══════════════ TOAST ═══════════════
+function toast(msg,t='s'){const el=document.createElement('div');el.className=`toast ${t}`;el.textContent=msg;document.getElementById('tw').appendChild(el);setTimeout(()=>el.remove(),3500);}
+
+// ═══════════════ INIT ═══════════════
+loadLocal();
+load(); // async — fetches from server, then renders
+
+// Refresh lockout timer display every second
+setInterval(()=>{if(lockedOut())checkLockout();},1000);
+</script>
+</body>
+</html>
