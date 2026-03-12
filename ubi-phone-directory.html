@@ -204,10 +204,10 @@ td{padding:.65rem .95rem;font-size:.83rem;vertical-align:middle}
   <div class="lockout-bar" id="lockoutBar"></div>
 
   <div class="toolbar">
-    <div class="sw"><span class="si">🔍</span>
-      <input type="text" id="q" placeholder="Search name, extension, department, role…" oninput="render()">
+    <div class="sw"><span class="si" aria-hidden="true">🔍</span>
+      <input type="text" id="q" aria-label="Search directory" placeholder="Search name, extension, department, role…" oninput="render()">
     </div>
-    <select class="fs" id="df" onchange="render()"><option value="">All Departments</option></select>
+    <select class="fs" id="df" aria-label="Filter by department" onchange="render()"><option value="">All Departments</option></select>
     <button class="btn bit" onclick="openIT()">🖥️ Request IT Change</button>
     <!-- NO visible admin button — type "ADMIN" anywhere to open -->
   </div>
@@ -305,7 +305,7 @@ td{padding:.65rem .95rem;font-size:.83rem;vertical-align:middle}
         <div class="ic">📤</div>
         <h3>Export</h3>
         <p>Download current directory as a formatted Word (.docx) file</p>
-        <button class="btn bp" style="width:100%" onclick="exportDocx()">Export .docx</button>
+        <button class="btn bp" style="width:100%" aria-label="Export Word document" onclick="exportDocx()">Export .docx</button>
       </div>
       <div class="ie-card">
         <div class="ic">📥</div>
@@ -320,7 +320,21 @@ td{padding:.65rem .95rem;font-size:.83rem;vertical-align:middle}
     <div style="display:flex;flex-direction:column;gap:.6rem">
       <button class="btn bp" style="width:100%" onclick="closeM('admPanelM');openAdd()">➕ Add New Person</button>
       <button class="btn bo" style="width:100%" onclick="exportJSON()">💾 Export Raw JSON (for re-import)</button>
+      <button class="btn bo" style="width:100%" onclick="showAnalytics()">📊 Analytics Dashboard</button>
       <button class="btn bo" style="width:100%;color:var(--danger);border-color:var(--danger)" onclick="logOut()">🚪 Logout Admin</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ANALYTICS MODAL ═══ -->
+<div class="mb" id="analyticsM" aria-modal="true" role="dialog" aria-labelledby="analyticsTitle">
+  <div class="modal" style="max-width:620px">
+    <h2 id="analyticsTitle">📊 Analytics Dashboard <span class="tag">ADMIN</span></h2>
+    <p style="color:var(--muted);font-size:.8rem">Top extension/department lookups and peak usage hours.</p>
+    <div id="analyticsBody" class="copy-box">Loading analytics…</div>
+    <div class="ma">
+      <button class="btn bo" onclick="closeM('analyticsM')">Close</button>
+      <button class="btn bp" onclick="showAnalytics(true)">Refresh</button>
     </div>
   </div>
 </div>
@@ -354,7 +368,11 @@ td{padding:.65rem .95rem;font-size:.83rem;vertical-align:middle}
   </div>
 </div>
 
-<div class="tw" id="tw"></div>
+<div class="tw" id="tw" aria-live="polite"></div>
+<div id="undoWrap" style="position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:9999;display:none;background:var(--surface);border:1px solid var(--border);box-shadow:var(--sh);border-radius:10px;padding:.6rem .8rem;align-items:center;gap:.6rem">
+  <span id="undoTxt" style="font-size:.8rem;color:var(--text)"></span>
+  <button class="btn bo" style="padding:.3rem .6rem;font-size:.75rem" onclick="undoDelete()">Undo</button>
+</div>
 
 <script>
 // ═══════════════ CONFIG ═══════════════
@@ -469,9 +487,12 @@ function defData(){const D=LOC;
 // ═══════════════ STATE ═══════════════
 let data=[],editIdx=-1,isAdm=false,sCol='dept',sDir=1,lastUpd=null;
 let attempts=0,lockedUntil=0;
+let lastDeleted=null,undoTimer=null,lastSearchKey='',lastDeptFilter='';
 
 // ── backend path (same folder as this HTML file on the NAS) ──
 const API='save.php';
+const API_STATS='save.php?action=stats';
+const AUTO_REFRESH_MS=60*1000;
 
 // ── detect if running on a real server or just opened as a local file ──
 const IS_SERVER = window.location.protocol === 'http:' || window.location.protocol === 'https:';
@@ -549,7 +570,10 @@ async function persistToServer(){
   try{
     const r=await fetch(API,{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{
+        'Content-Type':'application/json',
+        'X-Admin-Actor': isAdm ? 'admin-ui' : 'user-ui'
+      },
       body:JSON.stringify({data,updated:lastUpd})
     });
     if(!r.ok) throw new Error('HTTP '+r.status);
@@ -603,6 +627,17 @@ function render(){
     const f=`${p.persons.join(' ')} ${p.ext} ${p.dept} ${p.role} ${p.location} ${(p.emails||[]).join(' ')}`.toLowerCase();
     return(!q||f.includes(q))&&(!df||p.dept===df);
   });
+
+  if(q && q!==lastSearchKey){
+    lastSearchKey=q;
+    sendStatEvent({type:'search', extension:q.replace(/[^0-9/]/g,''), department:q});
+  }
+  if(!q) lastSearchKey='';
+  if(df && df!==lastDeptFilter){
+    lastDeptFilter=df;
+    sendStatEvent({type:'dept_filter', department:df});
+  }
+  if(!df) lastDeptFilter='';
   rows.sort((a,b)=>{
     const av=(sCol==='name'?a.persons[0]:(a[sCol]||'')).toLowerCase();
     const bv=(sCol==='name'?b.persons[0]:(b[sCol]||'')).toLowerCase();
@@ -643,7 +678,7 @@ function render(){
       :`<span class="eb">📞 ${escHtml(p.ext)}</span>`;
 
     const actCell=isAdm
-      ?`<td><div class="ab"><button class="ib" onclick="editE(${data.indexOf(p)})">✏️</button><button class="ib dl" onclick="delE(${data.indexOf(p)})">🗑️</button></div></td>`
+      ?`<td><div class="ab"><button class="ib" aria-label="Edit entry" onclick="editE(${data.indexOf(p)})">✏️</button><button class="ib dl" aria-label="Delete entry" onclick="delE(${data.indexOf(p)})">🗑️</button></div></td>`
       :'<td></td>';
 
     return`<tr style="animation-delay:${delay}s">
@@ -844,7 +879,32 @@ async function saveE(){
 async function delE(i){
   const p=data[i];
   if(!confirm(`Remove "${p.persons.join(' / ')}" (Ext. ${p.ext})?`))return;
-  data.splice(i,1);render();toast(`Removed`,'s');
+  const removed=data.splice(i,1)[0];
+  render();
+  queueUndo(removed,i);
+  toast('Removed — you can undo for 10s','i');
+  await persist();
+}
+
+function queueUndo(entry,index){
+  lastDeleted={entry,index};
+  const wrap=document.getElementById('undoWrap');
+  document.getElementById('undoTxt').textContent=`Deleted ${entry.persons.join(' / ')}`;
+  wrap.style.display='flex';
+  clearTimeout(undoTimer);
+  undoTimer=setTimeout(()=>{lastDeleted=null;wrap.style.display='none';},10000);
+}
+
+async function undoDelete(){
+  if(!lastDeleted)return;
+  clearTimeout(undoTimer);
+  const {entry,index}=lastDeleted;
+  const at=Math.max(0,Math.min(index,data.length));
+  data.splice(at,0,entry);
+  lastDeleted=null;
+  document.getElementById('undoWrap').style.display='none';
+  render();
+  toast('Delete undone','s');
   await persist();
 }
 
@@ -1013,8 +1073,53 @@ async function exportDocx(){
   }
 }
 
+
+async function sendStatEvent(payload){
+  if(!IS_SERVER) return;
+  try{
+    await fetch(API_STATS,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  }catch{}
+}
+
+async function showAnalytics(force=false){
+  if(!isAdm){toast('Admin only','e');return;}
+  openM('analyticsM');
+  const body=document.getElementById('analyticsBody');
+  if(force) body.textContent='Refreshing analytics…';
+  try{
+    const r=await fetch(API_STATS,{headers:{'X-Admin-Pin':PIN}});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const json=await r.json();
+    const stats=json.stats||{};
+    const exts=Object.entries((stats.searches&&stats.searches.extensions)||{}).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    const depts=Object.entries((stats.searches&&stats.searches.departments)||{}).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    const hours=Object.entries((stats.usage&&stats.usage.hours)||{}).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    body.innerHTML=`<strong>Top Extensions</strong><br>${exts.map(([k,v])=>`${escHtml(k)} — ${v}`).join('<br>')||'No data'}<br><br><strong>Top Departments</strong><br>${depts.map(([k,v])=>`${escHtml(k)} — ${v}`).join('<br>')||'No data'}<br><br><strong>Peak Hours</strong><br>${hours.map(([k,v])=>`${escHtml(k)}:00 — ${v}`).join('<br>')||'No data'}`;
+  }catch(e){
+    body.textContent='Could not load analytics. Verify ADMIN_PIN on server matches app PIN.';
+  }
+}
+
+async function pollForUpdates(){
+  if(!IS_SERVER) return;
+  try{
+    const r=await fetch(API+'?t='+Date.now());
+    if(!r.ok) return;
+    const json=await r.json();
+    if(!json || !Array.isArray(json.data)) return;
+    const remoteUpdated=json.updated||null;
+    if(remoteUpdated && remoteUpdated!==lastUpd){
+      data=json.data;
+      lastUpd=remoteUpdated;
+      showUpd();
+      render();
+      toast('Directory auto-refreshed with latest changes','i');
+    }
+  }catch{}
+}
+
 // ═══════════════ MODAL HELPERS ═══════════════
-function openM(id){document.getElementById(id).classList.add('open');}
+function openM(id){const m=document.getElementById(id);m.classList.add('open');const focusable=m.querySelector('button,input,select,textarea');if(focusable)focusable.focus();}
 function closeM(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.mb').forEach(b=>b.addEventListener('click',e=>{if(e.target===b)closeM(b.id);}));
 
@@ -1027,6 +1132,8 @@ load(); // async — fetches from server, then renders
 
 // Refresh lockout timer display every second
 setInterval(()=>{if(lockedOut())checkLockout();},1000);
+// Silent auto-refresh every 60 seconds
+setInterval(pollForUpdates,AUTO_REFRESH_MS);
 </script>
 </body>
 </html>
