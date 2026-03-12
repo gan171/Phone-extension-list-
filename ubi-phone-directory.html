@@ -586,6 +586,15 @@ function showUpd(){
   el.textContent=d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})+' '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
 }
 
+function escHtml(v=''){
+  return String(v)
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;')
+    .replaceAll("'",'&#39;');
+}
+
 // ═══════════════ RENDER ═══════════════
 function render(){
   const q=document.getElementById('q').value.toLowerCase().trim();
@@ -615,7 +624,7 @@ function render(){
         const em=emails[j]||'';
         return`<div class="pcard">
           <div class="av" style="${aS(name)}">${ini}</div>
-          <div><div class="pname">${name}</div>${em?`<div class="pmail">${em}</div>`:''}</div>
+          <div><div class="pname">${escHtml(name)}</div>${em?`<div class="pmail">${escHtml(em)}</div>`:''}</div>
         </div>`;
       }).join('');
       nameCell=`<div class="person-list">${cards}</div>`;
@@ -624,14 +633,14 @@ function render(){
       const em0=emails[0]||'';
       nameCell=`<div class="nc">
         <div class="av" style="${aS(p.persons[0])}">${ini}</div>
-        <div><div class="nm">${p.persons[0]}</div>${em0?`<div class="em">${em0}</div>`:''}</div>
+        <div><div class="nm">${escHtml(p.persons[0])}</div>${em0?`<div class="em">${escHtml(em0)}</div>`:''}</div>
       </div>`;
     }
 
     // Ext cell
     const extCell=shared
-      ?`<div class="sb-w"><span class="eb">📞 ${p.ext}</span><span class="shtag">shared × ${p.persons.length}</span></div>`
-      :`<span class="eb">📞 ${p.ext}</span>`;
+      ?`<div class="sb-w"><span class="eb">📞 ${escHtml(p.ext)}</span><span class="shtag">shared × ${p.persons.length}</span></div>`
+      :`<span class="eb">📞 ${escHtml(p.ext)}</span>`;
 
     const actCell=isAdm
       ?`<td><div class="ab"><button class="ib" onclick="editE(${data.indexOf(p)})">✏️</button><button class="ib dl" onclick="delE(${data.indexOf(p)})">🗑️</button></div></td>`
@@ -640,9 +649,9 @@ function render(){
     return`<tr style="animation-delay:${delay}s">
       <td>${nameCell}</td>
       <td>${extCell}</td>
-      <td><span class="dp" style="${dS(p.dept)}">${p.dept}</span></td>
-      <td style="color:var(--muted);font-size:.79rem">${p.role||'—'}</td>
-      <td style="color:var(--muted);font-size:.79rem">${p.location||LOC}</td>
+      <td><span class="dp" style="${dS(p.dept)}">${escHtml(p.dept)}</span></td>
+      <td style="color:var(--muted);font-size:.79rem">${escHtml(p.role||'—')}</td>
+      <td style="color:var(--muted);font-size:.79rem">${escHtml(p.location||LOC)}</td>
       ${actCell}
     </tr>`;
   }).join('');
@@ -657,8 +666,8 @@ function render(){
 function updDept(){
   const sel=document.getElementById('df'),cur=sel.value;
   const depts=[...new Set(data.map(p=>p.dept))].sort();
-  sel.innerHTML='<option value="">All Departments</option>'+depts.map(d=>`<option value="${d}"${cur===d?' selected':''}>${d}</option>`).join('');
-  document.getElementById('dL').innerHTML=depts.map(d=>`<option value="${d}">`).join('');
+  sel.innerHTML='<option value="">All Departments</option>'+depts.map(d=>`<option value="${escHtml(d)}"${cur===d?' selected':''}>${escHtml(d)}</option>`).join('');
+  document.getElementById('dL').innerHTML=depts.map(d=>`<option value="${escHtml(d)}">`).join('');
 }
 
 function sortBy(c){
