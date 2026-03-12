@@ -321,7 +321,6 @@ td{padding:.65rem .95rem;font-size:.83rem;vertical-align:middle}
       <button class="btn bp" style="width:100%" onclick="closeM('admPanelM');openAdd()">➕ Add New Person</button>
       <button class="btn bo" style="width:100%" onclick="exportJSON()">💾 Export Raw JSON (for re-import)</button>
       <button class="btn bo" style="width:100%" onclick="showAnalytics()">📊 Analytics Dashboard</button>
-      <button class="btn bo" style="width:100%" onclick="showHistory()">🗂️ Backups & Audit Log</button>
       <button class="btn bo" style="width:100%;color:var(--danger);border-color:var(--danger)" onclick="logOut()">🚪 Logout Admin</button>
     </div>
   </div>
@@ -336,19 +335,6 @@ td{padding:.65rem .95rem;font-size:.83rem;vertical-align:middle}
     <div class="ma">
       <button class="btn bo" onclick="closeM('analyticsM')">Close</button>
       <button class="btn bp" onclick="showAnalytics(true)">Refresh</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ HISTORY MODAL ═══ -->
-<div class="mb" id="historyM" aria-modal="true" role="dialog" aria-labelledby="historyTitle">
-  <div class="modal" style="max-width:760px">
-    <h2 id="historyTitle">🗂️ Backups & Audit Log <span class="tag">ADMIN</span></h2>
-    <p style="color:var(--muted);font-size:.8rem">If this is a new setup, backups may be empty until at least one successful update is saved.</p>
-    <div id="historyBody" class="copy-box" style="max-height:420px;overflow:auto">Loading backup and audit history…</div>
-    <div class="ma">
-      <button class="btn bo" onclick="closeM('historyM')">Close</button>
-      <button class="btn bp" onclick="showHistory(true)">Refresh</button>
     </div>
   </div>
 </div>
@@ -506,7 +492,6 @@ let lastDeleted=null,undoTimer=null,lastSearchKey='',lastDeptFilter='';
 // ── backend path (same folder as this HTML file on the NAS) ──
 const API='save.php';
 const API_STATS='save.php?action=stats';
-const API_HISTORY='save.php?action=history';
 const AUTO_REFRESH_MS=60*1000;
 
 // ── detect if running on a real server or just opened as a local file ──
@@ -1131,34 +1116,6 @@ async function pollForUpdates(){
       toast('Directory auto-refreshed with latest changes','i');
     }
   }catch{}
-}
-
-
-async function showHistory(force=false){
-  if(!isAdm){toast('Admin only','e');return;}
-  openM('historyM');
-  const body=document.getElementById('historyBody');
-  if(force) body.textContent='Refreshing backup/audit history…';
-  try{
-    const r=await fetch(API_HISTORY,{headers:{'X-Admin-Pin':PIN}});
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    const json=await r.json();
-    const history=json.history||{};
-    const backups=Array.isArray(history.backups)?history.backups:[];
-    const audit=Array.isArray(history.audit)?history.audit:[];
-
-    const backupsHtml=backups.length
-      ? backups.map(b=>`${escHtml(b.name)} <span style="color:var(--muted)">(${Math.round((b.size||0)/1024)} KB, ${new Date(b.modified).toLocaleString('en-IN')})</span>`).join('<br>')
-      : 'No backups found yet. Make one save from Admin mode to create your first backup.';
-
-    const auditHtml=audit.length
-      ? audit.map(line=>escHtml(line)).join('<br>')
-      : 'No audit entries yet.';
-
-    body.innerHTML=`<strong>Backups (${backups.length})</strong><br>${backupsHtml}<br><br><strong>Recent Audit Log (${audit.length} lines)</strong><br>${auditHtml}`;
-  }catch(e){
-    body.textContent='Could not load backup/audit history. Verify ADMIN_PIN on server matches app PIN.';
-  }
 }
 
 // ═══════════════ MODAL HELPERS ═══════════════
