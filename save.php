@@ -4,6 +4,7 @@
  */
 header('Content-Type: application/json; charset=utf-8');
 
+// Allow only same-origin by default (override with ALLOWED_ORIGIN env var if needed)
 $allowedOrigin = getenv('ALLOWED_ORIGIN') ?: '';
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 if ($allowedOrigin !== '' && $origin === $allowedOrigin) {
@@ -146,7 +147,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    requireAllowedOrigin($allowedOrigin, $origin);
+    if ($allowedOrigin !== '' && $origin !== $allowedOrigin) {
+        http_response_code(403);
+        echo json_encode(['status' => 'error', 'message' => 'Origin not allowed']);
+        exit;
+    }
+
+    $raw = file_get_contents('php://input');
 
     $raw = file_get_contents('php://input');
     if (empty($raw)) {
@@ -194,6 +201,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    if (!is_array($decoded) || !isset($decoded['data']) || !is_array($decoded['data'])) {
+        http_response_code(422);
+        echo json_encode(['status' => 'error', 'message' => 'Invalid payload. Expected {"data":[],"updated":...}']);
+        exit;
+    }
+
+    if (count($decoded['data']) > 3000) {
+        http_response_code(413);
+        echo json_encode(['status' => 'error', 'message' => 'Payload too large']);
+        exit;
+    }
+
+    foreach ($decoded['data'] as $idx => $entry) {
+        if (!is_array($entry)) {
+            http_response_code(422);
+            echo json_encode(['status' => 'error', 'message' => 'Entry must be an object', 'index' => $idx]);
+            exit;
+        }
+        $hasPersons = isset($entry['persons']) && is_array($entry['persons']) && count($entry['persons']) > 0;
+        $hasExt = isset($entry['ext']) && trim((string)$entry['ext']) !== '';
+        $hasDept = isset($entry['dept']) && trim((string)$entry['dept']) !== '';
+        if (!$hasPersons || !$hasExt || !$hasDept) {
+            http_response_code(422);
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Each entry requires persons[], ext and dept',
+                'index' => $idx
+            ]);
+            exit;
+        }
+    }
+
+    // Write atomically: write to temp file, then rename
+    // This prevents corrupt data.json if server crashes mid-write
     $tmp = $dataFile . '.tmp';
     $bytes = file_put_contents($tmp, json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
     if ($bytes === false) {
@@ -205,16 +246,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         jsonFail(500, 'Could not finalize write');
     }
 
-    $actor = trim((string)($_SERVER['HTTP_X_ADMIN_ACTOR'] ?? 'unknown'));
-    $auditLine = sprintf(
-        "%s\t%s\t%s\tentries=%d\tbytes=%d\n",
-        gmdate('c'),
-        $actor,
-        $_SERVER['REMOTE_ADDR'] ?? '-',
-        count($decoded['data']),
-        $bytes
-    );
-    @file_put_contents($auditFile, $auditLine, FILE_APPEND);
+    if (!rename($tmp, $dataFile)) {
+        @unlink($tmp);
+        http_response_code(500);
+        echo json_encode(['status' => 'error', 'message' => 'Could not finalize write']);
+        exit;
+    }
 
     echo json_encode(['status' => 'ok', 'bytes' => $bytes]);
     exit;
