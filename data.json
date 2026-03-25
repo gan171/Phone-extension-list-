@@ -1,4 +1,9 @@
 {
   "data": [],
+  "floorMap": {
+    "canvasWidth": 1200,
+    "canvasHeight": 700,
+    "zones": []
+  },
   "updated": null
 }
