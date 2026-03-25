@@ -117,6 +117,51 @@ function defData(){const D=LOC;
 
 function defFloorMap(){
   return{
+    floors:{
+      '5':{
+        label:'5th Floor',
+        canvasWidth:1200,
+        canvasHeight:700,
+        zones:[
+          {id:'f5_conf',label:'Conference room',department:'None',x:200,y:20,width:220,height:120,colorOverride:null},
+          {id:'f5_cfo',label:'CFO',department:'Head Office',x:420,y:20,width:170,height:120,colorOverride:null},
+          {id:'f5_cbo',label:'CBO',department:'Head Office',x:590,y:20,width:170,height:120,colorOverride:null},
+          {id:'f5_cpo',label:'CPO',department:'Head Office',x:760,y:20,width:170,height:120,colorOverride:null},
+          {id:'f5_vphr',label:'VP-HR',department:'HR',x:200,y:145,width:90,height:70,colorOverride:null},
+          {id:'f5_room2',label:'Room#2',department:'None',x:200,y:215,width:90,height:70,colorOverride:null},
+          {id:'f5_acc',label:'Account',department:'Account',x:200,y:285,width:90,height:60,colorOverride:null},
+          {id:'f5_room3',label:'Room#3',department:'None',x:200,y:345,width:90,height:70,colorOverride:null},
+          {id:'f5_comp',label:'Compliance',department:'Internal Control & Compliance',x:290,y:145,width:90,height:145,colorOverride:null},
+          {id:'f5_ithead',label:'IT-Head',department:'IT',x:290,y:290,width:90,height:125,colorOverride:null},
+          {id:'f5_hr',label:'HR',department:'HR',x:390,y:140,width:370,height:130,colorOverride:null},
+          {id:'f5_ic',label:'Internal control',department:'Internal Control & Compliance',x:390,y:270,width:370,height:105,colorOverride:null},
+          {id:'f5_edu',label:'Edu Loan',department:'Education Loan',x:390,y:375,width:370,height:105,colorOverride:null},
+          {id:'f5_risk',label:'Risk and Internal audit heads',department:'AVP',x:760,y:140,width:170,height:180,colorOverride:null},
+          {id:'f5_server',label:'Server room',department:'None',x:760,y:320,width:170,height:70,colorOverride:null},
+          {id:'f5_md',label:'MD',department:'Head Office',x:760,y:390,width:170,height:170,colorOverride:null},
+          {id:'f5_admin',label:'Admin',department:'Admin',x:200,y:415,width:180,height:145,colorOverride:null},
+          {id:'f5_toilet',label:'Toilet',department:'None',x:390,y:490,width:95,height:70,colorOverride:null},
+          {id:'f5_pantry',label:'Pantry',department:'Pantry',x:485,y:490,width:275,height:70,colorOverride:null},
+          {id:'f5_ea',label:'EA to MD',department:'Head Office',x:760,y:500,width:75,height:60,colorOverride:null},
+        ]
+      },
+      '6':{
+        label:'6th Floor',
+        canvasWidth:1200,
+        canvasHeight:700,
+        zones:[
+          {id:'f6_balcony',label:'Balcony',department:'None',x:140,y:10,width:820,height:55,colorOverride:null},
+          {id:'f6_msme',label:'MSME Team',department:'MSME',x:150,y:75,width:390,height:40,colorOverride:null},
+          {id:'f6_left_bay',label:'CRM / Empanelment',department:'Empanelment & CRM Team',x:150,y:115,width:390,height:395,colorOverride:null},
+          {id:'f6_meeting',label:'Meeting Room',department:'None',x:150,y:510,width:390,height:170,colorOverride:null},
+          {id:'f6_center',label:'',department:'None',x:540,y:75,width:95,height:605,colorOverride:null},
+          {id:'f6_coo',label:'COO',department:'Head Office',x:635,y:75,width:325,height:190,colorOverride:null},
+          {id:'f6_vacant',label:'Vacant seating area',department:'None',x:635,y:265,width:325,height:210,colorOverride:null},
+          {id:'f6_pantry',label:'Pantry',department:'Pantry',x:730,y:475,width:230,height:100,colorOverride:null},
+          {id:'f6_toilet',label:'Toilet',department:'None',x:730,y:575,width:230,height:105,colorOverride:null}
+        ]
+      }
+    }
     canvasWidth:1200,
     canvasHeight:700,
     zones:[

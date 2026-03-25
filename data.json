@@ -1,9 +1,20 @@
 {
   "data": [],
   "floorMap": {
-    "canvasWidth": 1200,
-    "canvasHeight": 700,
-    "zones": []
+    "floors": {
+      "5": {
+        "label": "5th Floor",
+        "canvasWidth": 1200,
+        "canvasHeight": 700,
+        "zones": []
+      },
+      "6": {
+        "label": "6th Floor",
+        "canvasWidth": 1200,
+        "canvasHeight": 700,
+        "zones": []
+      }
+    }
   },
   "updated": null
 }
