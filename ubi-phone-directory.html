@@ -47,6 +47,13 @@
 
   <div class="lockout-bar" id="lockoutBar"></div>
 
+  <div class="main-tabs">
+    <button class="main-tab-btn active" id="tabHomeBtn" onclick="switchMainTab('home')">Home</button>
+    <button class="main-tab-btn" id="tabFloorBtn" onclick="switchMainTab('floor')">Floor Map</button>
+    <button class="main-tab-btn" id="tabAdminBtn" onclick="switchMainTab('admin')">Admin</button>
+  </div>
+
+  <section id="homeTabPane">
   <div class="toolbar">
     <div class="sw"><span class="si" aria-hidden="true">🔍</span>
       <input type="text" id="q" aria-label="Search directory" placeholder="Search name, extension, department, role…" oninput="render()">
@@ -94,6 +101,37 @@
     </table>
   </div>
   <div class="card-grid" id="cardGrid" style="display:none"></div>
+  </section>
+
+  <section id="floorTabPane" class="floor-tab-pane" style="display:none">
+    <div class="floor-switcher" id="floorSwitcher"></div>
+    <div class="floor-toolbar" id="floorToolbar" style="display:none">
+      <button class="btn bp" onclick="floorAddZone()">Add Zone</button>
+      <button class="btn bo" onclick="floorDeleteSelectedZone()">Delete Zone</button>
+      <input type="color" id="floorColorPicker" title="Zone color override" onchange="floorApplyColorOverride(this.value)">
+      <button class="btn bo" onclick="floorResetColorOverride()">Reset to Auto</button>
+      <button class="btn bo" onclick="floorUndo()">Undo</button>
+      <button class="btn bp" onclick="floorSaveLayout()">Save Layout</button>
+    </div>
+
+    <div class="floor-map-wrap" id="floorMapWrap">
+      <svg id="floorMapSvg" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="floor-legend" id="floorLegend"></div>
+      <div class="zone-prop-panel" id="zonePropPanel" style="display:none">
+        <div class="ff full"><label>Zone Label</label><input type="text" id="zonePropLabel" oninput="floorPropChanged()"></div>
+        <div class="ff full"><label>Department</label><select id="zonePropDept" onchange="floorPropChanged()"></select></div>
+        <div class="ff full"><label>Color Override</label><input type="color" id="zonePropColor" onchange="floorPropChanged(true)"></div>
+        <div class="ma">
+          <button class="btn bo" onclick="floorResetColorOverride()">Reset to Auto</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="floor-cards-panel" id="floorCardsPanel">
+      <button class="floor-cards-close" onclick="closeFloorCardsPanel()">×</button>
+      <div class="card-grid floor-card-grid" id="floorCardGrid"></div>
+    </div>
+  </section>
 </div>
 
 <!-- SECRET HINT invisible -->
