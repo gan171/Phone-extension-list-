@@ -115,6 +115,28 @@ function defData(){const D=LOC;
   mk(58,'Big Conference Room','142','Admin','Conference Room',null,null,true),
 ];}
 
+function defFloorMap(){
+  return{
+    canvasWidth:1200,
+    canvasHeight:700,
+    zones:[
+      {id:'zone_conf',label:'Conference room',department:'None',x:20,y:20,width:260,height:160,colorOverride:null},
+      {id:'zone_cfo',label:'CFO',department:'Head Office',x:280,y:20,width:220,height:160,colorOverride:null},
+      {id:'zone_cbo',label:'CBO',department:'Head Office',x:500,y:20,width:220,height:160,colorOverride:null},
+      {id:'zone_cpo',label:'CPO',department:'Head Office',x:860,y:20,width:320,height:160,colorOverride:null},
+      {id:'zone_hr',label:'HR',department:'HR',x:360,y:180,width:500,height:150,colorOverride:null},
+      {id:'zone_ic',label:'Internal control',department:'Internal Control & Compliance',x:360,y:330,width:500,height:120,colorOverride:null},
+      {id:'zone_edu',label:'Edu Loan',department:'Education Loan',x:360,y:450,width:500,height:120,colorOverride:null},
+      {id:'zone_risk',label:'Risk and internal audit heads',department:'AVP',x:860,y:180,width:320,height:220,colorOverride:null},
+      {id:'zone_server',label:'Server room',department:'None',x:860,y:400,width:320,height:80,colorOverride:null},
+      {id:'zone_md',label:'MD',department:'Head Office',x:860,y:480,width:320,height:180,colorOverride:null},
+      {id:'zone_admin',label:'Admin',department:'Admin',x:20,y:520,width:240,height:140,colorOverride:null},
+      {id:'zone_pantry',label:'Pantry',department:'None',x:400,y:520,width:460,height:140,colorOverride:null},
+      {id:'zone_ea',label:'EA to MD',department:'Head Office',x:860,y:560,width:160,height:100,colorOverride:null},
+    ]
+  };
+}
+
 // ═══════════════ STATE ═══════════════
 let data=[],editIdx=-1,isAdm=false,sCol='dept',sDir=1,lastUpd=null;
 let attempts=0,lockedUntil=0;
@@ -122,6 +144,12 @@ let lastDeleted=null,undoTimer=null,lastSearchKey='',lastDeptFilter='';
 let curView='table';          // 'table' | 'card'
 let showFavsOnly=false;       // favorites filter toggle
 let selectedIds=new Set();    // bulk-delete selection
+let mainTab='home';
+let floorMap=null;
+let floorSelectedZoneId=null;
+let floorActiveZoneId=null;
+let floorUndoSnapshot=null;
+let floorDragState=null;
 
 // ── employee session (sessionStorage — clears on tab close) ──
 const EMP_SESSION_KEY='ubi_emp_session';
@@ -173,12 +201,12 @@ function saveLocal(){localStorage.setItem(SK,JSON.stringify({attempts,lockedUnti
 function loadFromLocal(){
   try{
     const s=localStorage.getItem(SK+'_data');
-    if(s){const p=JSON.parse(s);data=p.data||defData();lastUpd=p.updated||null;}
-    else{data=defData();lastUpd=new Date().toISOString();saveDataLocal();}
-  }catch{data=defData();}
+    if(s){const p=JSON.parse(s);data=p.data||defData();floorMap=p.floorMap||defFloorMap();lastUpd=p.updated||null;}
+    else{data=defData();floorMap=defFloorMap();lastUpd=new Date().toISOString();saveDataLocal();}
+  }catch{data=defData();floorMap=defFloorMap();}
 }
 function saveDataLocal(){
-  localStorage.setItem(SK+'_data',JSON.stringify({data,updated:lastUpd}));
+  localStorage.setItem(SK+'_data',JSON.stringify({data,floorMap,updated:lastUpd}));
 }
 
 // ── load data ──────────────────────────────────────────────────────────────
@@ -202,12 +230,15 @@ async function load(){
     const json=await r.json();
     if(json.data&&Array.isArray(json.data)){
       data=json.data;
+      floorMap=json.floorMap||defFloorMap();
       lastUpd=json.updated||null;
     } else if(Array.isArray(json)&&json.length>0){
       data=json;
+      floorMap=defFloorMap();
     } else {
       // Server has empty data.json — seed with defaults and save
       data=defData();
+      floorMap=defFloorMap();
       await persistToServer();
     }
     migrateData();
@@ -221,11 +252,13 @@ async function load(){
   }
   showUpd();
   render();
+  renderFloorMap();
   checkBirthdays();
 }
 
 // ── migrate old records to add new fields ──────────────────────────────────
 function migrateData(){
+  if(!floorMap||!Array.isArray(floorMap.zones)) floorMap=defFloorMap();
   data.forEach(p=>{
     // ── new per-person PIN model ──
     // migrate old single pin/pinSet to new per-person pins/pinsSet objects
@@ -276,7 +309,7 @@ async function persistToServer(){
         'Content-Type':'application/json',
         'X-Admin-Actor': isAdm ? 'admin-ui' : 'user-ui'
       },
-      body:JSON.stringify({data,updated:lastUpd})
+      body:JSON.stringify({data,floorMap,updated:lastUpd})
     });
     if(!r.ok) throw new Error('HTTP '+r.status);
     setSyncStatus('ok');
@@ -651,6 +684,219 @@ function setView(v){
   render();
 }
 
+// ═══════════════ MAIN TABS + FLOOR MAP ═══════════════
+function switchMainTab(tab){
+  mainTab=tab;
+  document.getElementById('tabHomeBtn').classList.toggle('active',tab==='home');
+  document.getElementById('tabFloorBtn').classList.toggle('active',tab==='floor');
+  document.getElementById('tabAdminBtn').classList.toggle('active',tab==='admin');
+  document.getElementById('homeTabPane').style.display=tab==='home'?'':'none';
+  document.getElementById('floorTabPane').style.display=tab==='floor'?'':'none';
+  if(tab==='admin'){
+    if(isAdm){openM('admPanelM');}
+    else{checkLockout();if(!lockedOut())openM('pinM');}
+    mainTab='home';
+    document.getElementById('tabHomeBtn').classList.add('active');
+    document.getElementById('tabAdminBtn').classList.remove('active');
+    return;
+  }
+  if(tab==='floor') renderFloorMap();
+}
+
+function floorIsEditMode(){ return isAdm && mainTab==='floor'; }
+function getFloorDepartmentOptions(){
+  return [...new Set(data.map(p=>p.dept))].sort();
+}
+function floorColorForZone(z){
+  if(z.colorOverride) return z.colorOverride;
+  if(!z.department||z.department==='None') return '#e0e0e0';
+  const pair=DC[z.department]||AV[Math.abs(z.department.split('').reduce((a,c)=>a+c.charCodeAt(0),0))%AV.length];
+  return pair[0];
+}
+function floorTextColor(hex){
+  const c=(hex||'#e0e0e0').replace('#','');
+  const n=parseInt(c.length===3?c.split('').map(x=>x+x).join(''):c,16);
+  const r=(n>>16)&255,g=(n>>8)&255,b=n&255;
+  return (r*299+g*587+b*114)/1000>150?'#111827':'#ffffff';
+}
+function floorGetZoneById(id){ return floorMap.zones.find(z=>z.id===id); }
+function floorToSvgPoint(evt){
+  const svg=document.getElementById('floorMapSvg');
+  const pt=svg.createSVGPoint(); pt.x=evt.clientX; pt.y=evt.clientY;
+  return pt.matrixTransform(svg.getScreenCTM().inverse());
+}
+function floorPushUndo(){ floorUndoSnapshot=JSON.stringify(floorMap); }
+function floorUndo(){
+  if(!floorUndoSnapshot) return;
+  floorMap=JSON.parse(floorUndoSnapshot); floorUndoSnapshot=null; floorSelectedZoneId=null;
+  renderFloorMap();
+}
+function floorAddZone(){
+  floorPushUndo();
+  const id='zone_'+Math.random().toString(36).slice(2,8);
+  floorMap.zones.push({id,label:'New Zone',department:'None',x:100,y:100,width:160,height:90,colorOverride:null});
+  floorSelectedZoneId=id; renderFloorMap();
+}
+function floorDeleteSelectedZone(){
+  if(!floorSelectedZoneId) return;
+  floorPushUndo();
+  floorMap.zones=floorMap.zones.filter(z=>z.id!==floorSelectedZoneId);
+  floorSelectedZoneId=null; renderFloorMap();
+}
+function floorSaveLayout(){ persist(); toast('Floor map layout saved','s'); }
+function floorApplyColorOverride(v){
+  const z=floorGetZoneById(floorSelectedZoneId); if(!z) return;
+  floorPushUndo(); z.colorOverride=v; renderFloorMap();
+}
+function floorResetColorOverride(){
+  const z=floorGetZoneById(floorSelectedZoneId); if(!z) return;
+  floorPushUndo(); z.colorOverride=null; renderFloorMap();
+}
+function floorPropChanged(setColor){
+  const z=floorGetZoneById(floorSelectedZoneId); if(!z) return;
+  z.label=document.getElementById('zonePropLabel').value.trim()||'Zone';
+  z.department=document.getElementById('zonePropDept').value;
+  if(setColor) z.colorOverride=document.getElementById('zonePropColor').value;
+  renderFloorMap();
+}
+function closeFloorCardsPanel(){
+  document.getElementById('floorCardsPanel').classList.remove('open');
+}
+
+function renderFloorMap(){
+  if(!floorMap) floorMap=defFloorMap();
+  const svg=document.getElementById('floorMapSvg');
+  const toolbar=document.getElementById('floorToolbar');
+  toolbar.style.display=floorIsEditMode()?'flex':'none';
+  svg.setAttribute('viewBox',`0 0 ${floorMap.canvasWidth} ${floorMap.canvasHeight}`);
+  svg.innerHTML='';
+
+  floorMap.zones.forEach(z=>{
+    const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.setAttribute('class','fm-zone-group');
+    g.dataset.id=z.id;
+    const r=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    const fill=floorColorForZone(z);
+    r.setAttribute('x',z.x);r.setAttribute('y',z.y);r.setAttribute('width',z.width);r.setAttribute('height',z.height);
+    r.setAttribute('rx',6);r.setAttribute('ry',6);
+    r.setAttribute('fill',fill);r.setAttribute('fill-opacity',floorIsEditMode()?'0.18':'0.24');
+    r.setAttribute('stroke',z.id===floorSelectedZoneId||z.id===floorActiveZoneId?'#ef4444':'#111827');
+    r.setAttribute('stroke-width',z.id===floorActiveZoneId?4:2);
+    r.addEventListener('click',e=>{e.stopPropagation();floorZoneClick(z.id);});
+    r.addEventListener('dblclick',e=>{e.stopPropagation();floorSelectForEdit(z.id,true);});
+    g.appendChild(r);
+    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x',z.x+z.width/2);t.setAttribute('y',z.y+z.height/2);
+    t.setAttribute('text-anchor','middle');t.setAttribute('dominant-baseline','middle');
+    t.setAttribute('fill',floorTextColor(fill));t.setAttribute('font-size','20');t.setAttribute('font-weight','600');
+    t.textContent=z.label; g.appendChild(t);
+    if(floorIsEditMode() && z.id===floorSelectedZoneId){
+      floorRenderHandles(g,z);
+      floorBindDrag(r,z);
+    }
+    svg.appendChild(g);
+  });
+
+  svg.onclick=()=>{ if(floorIsEditMode()){floorSelectedZoneId=null;renderFloorMap();} };
+  renderFloorLegend();
+  renderFloorZoneProps();
+}
+
+function floorRenderHandles(g,z){
+  const pts=[
+    ['nw',z.x,z.y],['n',z.x+z.width/2,z.y],['ne',z.x+z.width,z.y],
+    ['e',z.x+z.width,z.y+z.height/2],['se',z.x+z.width,z.y+z.height],
+    ['s',z.x+z.width/2,z.y+z.height],['sw',z.x,z.y+z.height],['w',z.x,z.y+z.height/2]
+  ];
+  pts.forEach(([h,x,y])=>{
+    const c=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    c.setAttribute('x',x-5);c.setAttribute('y',y-5);c.setAttribute('width',10);c.setAttribute('height',10);
+    c.setAttribute('fill','#ffffff');c.setAttribute('stroke','#ef4444');c.setAttribute('class','fm-handle');
+    c.addEventListener('mousedown',e=>floorStartResize(e,z.id,h));
+    g.appendChild(c);
+  });
+}
+function floorBindDrag(el,z){ el.addEventListener('mousedown',e=>floorStartDrag(e,z.id)); }
+function floorSelectForEdit(id,showProps){
+  floorSelectedZoneId=id;
+  if(showProps) document.getElementById('zonePropPanel').style.display='block';
+  renderFloorMap();
+}
+function floorZoneClick(id){
+  if(floorIsEditMode()){ floorSelectForEdit(id,false); return; }
+  const z=floorGetZoneById(id); if(!z) return;
+  if(z.department==='None'){ floorActiveZoneId=id; closeFloorCardsPanel(); renderFloorMap(); return; }
+  if(floorActiveZoneId===id){ closeFloorCardsPanel(); floorActiveZoneId=null; renderFloorMap(); return; }
+  floorActiveZoneId=id;
+  const rows=data.filter(p=>p.dept===z.department);
+  renderFloorCards(rows);
+  document.getElementById('floorCardsPanel').classList.add('open');
+  renderFloorMap();
+}
+function renderFloorCards(rows){
+  const grid=document.getElementById('floorCardGrid');
+  if(!rows.length){ grid.innerHTML='<div class="empty"><div class="ei">📭</div><p>No entries found.</p></div>'; return; }
+  grid.innerHTML=rows.map(p=>{
+    const ini=p.persons[0].split(' ').map(w=>w[0]||'').slice(0,2).join('').toUpperCase();
+    const isFav=favs.has(p.id);
+    return `<div class="emp-card" onclick="openCardModal(${p.id})">
+      <div class="ec-top"><div class="ec-av" style="${aS(p.persons[0])}">${ini}</div>
+      <button class="star${isFav?' on':''}" onclick="toggleFav(${p.id},event)">${isFav?'★':'☆'}</button></div>
+      <div class="ec-names">${escHtml(p.persons.join(' / '))}</div>
+      <div class="ec-role">${escHtml(p.role||'—')}</div>
+      <div class="ec-footer"><span class="dp" style="${dS(p.dept)};font-size:.6rem">${escHtml(p.dept)}</span>
+      <a class="tel-link eb" href="tel:${escHtml(p.ext)}">📞 ${escHtml(p.ext)}</a></div>
+    </div>`;
+  }).join('');
+}
+function renderFloorLegend(){
+  const el=document.getElementById('floorLegend');
+  const depts=[...new Set(floorMap.zones.map(z=>z.department).filter(d=>d&&d!=='None'))];
+  el.innerHTML=depts.map(d=>`<div><span style="background:${floorColorForZone({department:d,colorOverride:null})}"></span>${escHtml(d)}</div>`).join('');
+}
+function renderFloorZoneProps(){
+  const panel=document.getElementById('zonePropPanel');
+  if(!floorIsEditMode()||!floorSelectedZoneId){ panel.style.display='none'; return; }
+  panel.style.display='block';
+  const z=floorGetZoneById(floorSelectedZoneId); if(!z) return;
+  document.getElementById('zonePropLabel').value=z.label||'';
+  const sel=document.getElementById('zonePropDept');
+  sel.innerHTML=`<option value="None">None</option>`+getFloorDepartmentOptions().map(d=>`<option ${z.department===d?'selected':''}>${escHtml(d)}</option>`).join('');
+  sel.value=z.department||'None';
+  document.getElementById('zonePropColor').value=z.colorOverride||'#1a56e8';
+}
+function floorStartDrag(evt,id){
+  if(!floorIsEditMode()) return;
+  evt.preventDefault(); floorPushUndo();
+  const z=floorGetZoneById(id); if(!z) return; floorSelectedZoneId=id;
+  const p=floorToSvgPoint(evt);
+  floorDragState={type:'move',id,start:p,orig:{x:z.x,y:z.y,width:z.width,height:z.height}};
+  window.addEventListener('mousemove',floorOnMove); window.addEventListener('mouseup',floorEndDrag);
+}
+function floorStartResize(evt,id,handle){
+  evt.preventDefault(); evt.stopPropagation(); floorPushUndo();
+  const z=floorGetZoneById(id); if(!z) return; floorSelectedZoneId=id;
+  const p=floorToSvgPoint(evt);
+  floorDragState={type:'resize',handle,id,start:p,orig:{x:z.x,y:z.y,width:z.width,height:z.height}};
+  window.addEventListener('mousemove',floorOnMove); window.addEventListener('mouseup',floorEndDrag);
+}
+function floorOnMove(evt){
+  if(!floorDragState) return;
+  const z=floorGetZoneById(floorDragState.id); if(!z) return;
+  const p=floorToSvgPoint(evt); const dx=p.x-floorDragState.start.x; const dy=p.y-floorDragState.start.y;
+  if(floorDragState.type==='move'){ z.x=Math.max(0,floorDragState.orig.x+dx); z.y=Math.max(0,floorDragState.orig.y+dy); }
+  else{
+    const o=floorDragState.orig; let x=o.x,y=o.y,w=o.width,h=o.height;
+    if(floorDragState.handle.includes('e')) w=Math.max(40,o.width+dx);
+    if(floorDragState.handle.includes('s')) h=Math.max(30,o.height+dy);
+    if(floorDragState.handle.includes('w')){ x=o.x+dx; w=Math.max(40,o.width-dx); }
+    if(floorDragState.handle.includes('n')){ y=o.y+dy; h=Math.max(30,o.height-dy); }
+    z.x=x;z.y=y;z.width=w;z.height=h;
+  }
+  renderFloorMap();
+}
+function floorEndDrag(){ floorDragState=null; window.removeEventListener('mousemove',floorOnMove); window.removeEventListener('mouseup',floorEndDrag); }
+
 // ═══════════════ FAVORITES ═══════════════
 function toggleFav(id, e){
   if(e) e.stopPropagation();
@@ -748,6 +994,7 @@ let keyBuf='';
 const SECRET='ADMIN';
 document.addEventListener('keydown',e=>{
   if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))return;
+  if(mainTab==='floor'&&floorIsEditMode()&&e.key==='Delete'&&floorSelectedZoneId){ floorDeleteSelectedZone(); return; }
   if(e.key==='Escape'){closeM('pinM');closeM('fM');closeM('itM');closeM('admPanelM');keyBuf='';return;}
   if(e.key==='/'&&document.activeElement.tagName!=='INPUT'){e.preventDefault();document.getElementById('q').focus();return;}
   // build secret buffer
@@ -808,7 +1055,7 @@ function pcheck(){
     isAdm=true;pb='';updPD();
     document.getElementById('ah').style.display='';
     document.getElementById('admBar').classList.add('visible');
-    render();closeM('pinM');openM('admPanelM');admTab('people');populateAdmStats();
+    render(); if(mainTab==='floor') renderFloorMap(); closeM('pinM');openM('admPanelM');admTab('people');populateAdmStats();
     document.getElementById('pe2txt').textContent='';
     document.getElementById('attTxt').textContent='';
     toast('Admin mode enabled','s');
@@ -837,7 +1084,7 @@ function logOut(){
   document.getElementById('ah').style.display='none';
   document.getElementById('admBar').classList.remove('visible');
   document.getElementById('bulkBar').classList.remove('visible');
-  render();closeM('admPanelM');toast('Logged out','s');
+  render(); if(mainTab==='floor') renderFloorMap(); closeM('admPanelM');toast('Logged out','s');
 }
 
 // ═══════════════ CRUD ═══════════════
@@ -989,7 +1236,7 @@ async function undoDelete(){
 
 // ═══════════════ IMPORT / EXPORT ═══════════════
 function exportJSON(){
-  const blob=new Blob([JSON.stringify({data,updated:lastUpd},null,2)],{type:'application/json'});
+  const blob=new Blob([JSON.stringify({data,floorMap,updated:lastUpd},null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
   a.download=`ubi-directory-${new Date().toISOString().slice(0,10)}.json`;a.click();
   toast('JSON exported','s');
@@ -1009,7 +1256,9 @@ function importJSON(e){
         if(!p.emails)p.emails=p.noEmail?[]:p.persons.map(n=>autoEmail(n));
         return p;
       });
+      floorMap=parsed.floorMap||floorMap||defFloorMap();
       await persist();render();
+      if(mainTab==='floor') renderFloorMap();
       toast(`Imported ${data.length} entries`,'s');
       closeM('admPanelM');
     }catch{toast('Invalid file. Please use an exported JSON file.','e');}
