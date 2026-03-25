@@ -720,9 +720,6 @@ mark.hl{background:rgba(251,191,36,.35);color:inherit;border-radius:2px;padding:
 
 /* FLOOR MAP */
 .floor-tab-pane{display:flex;flex-direction:column;gap:.7rem}
-.floor-switcher{display:flex;gap:.5rem;flex-wrap:wrap}
-.floor-switch-btn{border:1px solid var(--border);background:var(--surface);color:var(--muted);padding:.4rem .75rem;border-radius:999px;cursor:pointer;font-weight:600}
-.floor-switch-btn.active{background:var(--as);border-color:var(--accent);color:var(--accent)}
 .floor-toolbar{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
 .floor-map-wrap{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--sh);height:58vh;min-height:360px;overflow:hidden}
 #floorMapSvg{width:100%;height:100%;display:block;background:var(--surface2)}
@@ -730,9 +727,9 @@ mark.hl{background:rgba(251,191,36,.35);color:inherit;border-radius:2px;padding:
 .floor-legend div{display:flex;align-items:center;gap:.35rem;margin:.15rem 0}
 .floor-legend span{width:10px;height:10px;border-radius:2px;display:inline-block}
 .zone-prop-panel{position:absolute;left:10px;top:10px;width:260px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.55rem;z-index:4}
-.floor-cards-panel{position:relative;height:0;overflow:hidden;transition:height .28s ease,opacity .28s ease;opacity:0;background:var(--surface);border:1px solid var(--border);border-radius:12px}
-.floor-cards-panel.open{height:35vh;min-height:220px;opacity:1;padding:.7rem}
+.floor-cards-panel{position:relative;max-height:0;overflow:hidden;transition:max-height .28s ease,opacity .28s ease;opacity:0;background:var(--surface);border:1px solid var(--border);border-radius:12px}
+.floor-cards-panel.open{max-height:42vh;opacity:1;padding:.7rem}
 .floor-cards-close{position:absolute;right:8px;top:6px;background:transparent;border:0;font-size:1.1rem;color:var(--muted);cursor:pointer}
-.floor-card-grid{padding-top:1rem;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));height:100%;overflow:auto}
+.floor-card-grid{padding-top:1rem;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
 .fm-zone-group{cursor:pointer}
 .fm-handle{cursor:nwse-resize}

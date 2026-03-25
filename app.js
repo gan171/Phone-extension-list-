@@ -162,6 +162,23 @@ function defFloorMap(){
         ]
       }
     }
+    canvasWidth:1200,
+    canvasHeight:700,
+    zones:[
+      {id:'zone_conf',label:'Conference room',department:'None',x:20,y:20,width:260,height:160,colorOverride:null},
+      {id:'zone_cfo',label:'CFO',department:'Head Office',x:280,y:20,width:220,height:160,colorOverride:null},
+      {id:'zone_cbo',label:'CBO',department:'Head Office',x:500,y:20,width:220,height:160,colorOverride:null},
+      {id:'zone_cpo',label:'CPO',department:'Head Office',x:860,y:20,width:320,height:160,colorOverride:null},
+      {id:'zone_hr',label:'HR',department:'HR',x:360,y:180,width:500,height:150,colorOverride:null},
+      {id:'zone_ic',label:'Internal control',department:'Internal Control & Compliance',x:360,y:330,width:500,height:120,colorOverride:null},
+      {id:'zone_edu',label:'Edu Loan',department:'Education Loan',x:360,y:450,width:500,height:120,colorOverride:null},
+      {id:'zone_risk',label:'Risk and internal audit heads',department:'AVP',x:860,y:180,width:320,height:220,colorOverride:null},
+      {id:'zone_server',label:'Server room',department:'None',x:860,y:400,width:320,height:80,colorOverride:null},
+      {id:'zone_md',label:'MD',department:'Head Office',x:860,y:480,width:320,height:180,colorOverride:null},
+      {id:'zone_admin',label:'Admin',department:'Admin',x:20,y:520,width:240,height:140,colorOverride:null},
+      {id:'zone_pantry',label:'Pantry',department:'None',x:400,y:520,width:460,height:140,colorOverride:null},
+      {id:'zone_ea',label:'EA to MD',department:'Head Office',x:860,y:560,width:160,height:100,colorOverride:null},
+    ]
   };
 }
 
@@ -174,7 +191,6 @@ let showFavsOnly=false;       // favorites filter toggle
 let selectedIds=new Set();    // bulk-delete selection
 let mainTab='home';
 let floorMap=null;
-let floorActiveFloor='5';
 let floorSelectedZoneId=null;
 let floorActiveZoneId=null;
 let floorUndoSnapshot=null;
@@ -287,10 +303,7 @@ async function load(){
 
 // ── migrate old records to add new fields ──────────────────────────────────
 function migrateData(){
-  if(!floorMap||!floorMap.floors) floorMap=defFloorMap();
-  if(!floorMap.floors['5']) floorMap.floors['5']=defFloorMap().floors['5'];
-  if(!floorMap.floors['6']) floorMap.floors['6']=defFloorMap().floors['6'];
-  if(!floorMap.floors[floorActiveFloor]) floorActiveFloor=Object.keys(floorMap.floors)[0]||'5';
+  if(!floorMap||!Array.isArray(floorMap.zones)) floorMap=defFloorMap();
   data.forEach(p=>{
     // ── new per-person PIN model ──
     // migrate old single pin/pinSet to new per-person pins/pinsSet objects
@@ -736,22 +749,6 @@ function switchMainTab(tab){
 }
 
 function floorIsEditMode(){ return isAdm && mainTab==='floor'; }
-function getCurrentFloor(){
-  return floorMap.floors[floorActiveFloor]||Object.values(floorMap.floors)[0];
-}
-function switchFloor(floorKey){
-  if(!floorMap.floors[floorKey]) return;
-  floorActiveFloor=floorKey;
-  floorActiveZoneId=null;
-  floorSelectedZoneId=null;
-  closeFloorCardsPanel();
-  renderFloorMap();
-}
-function renderFloorSwitcher(){
-  const wrap=document.getElementById('floorSwitcher');
-  const keys=Object.keys(floorMap.floors);
-  wrap.innerHTML=keys.map(k=>`<button class="floor-switch-btn ${k===floorActiveFloor?'active':''}" onclick="switchFloor('${k}')">${escHtml(floorMap.floors[k].label||k)}</button>`).join('');
-}
 function getFloorDepartmentOptions(){
   return [...new Set(data.map(p=>p.dept))].sort();
 }
@@ -767,7 +764,7 @@ function floorTextColor(hex){
   const r=(n>>16)&255,g=(n>>8)&255,b=n&255;
   return (r*299+g*587+b*114)/1000>150?'#111827':'#ffffff';
 }
-function floorGetZoneById(id){ return getCurrentFloor().zones.find(z=>z.id===id); }
+function floorGetZoneById(id){ return floorMap.zones.find(z=>z.id===id); }
 function floorToSvgPoint(evt){
   const svg=document.getElementById('floorMapSvg');
   const pt=svg.createSVGPoint(); pt.x=evt.clientX; pt.y=evt.clientY;
@@ -782,13 +779,13 @@ function floorUndo(){
 function floorAddZone(){
   floorPushUndo();
   const id='zone_'+Math.random().toString(36).slice(2,8);
-  getCurrentFloor().zones.push({id,label:'New Zone',department:'None',x:100,y:100,width:160,height:90,colorOverride:null});
+  floorMap.zones.push({id,label:'New Zone',department:'None',x:100,y:100,width:160,height:90,colorOverride:null});
   floorSelectedZoneId=id; renderFloorMap();
 }
 function floorDeleteSelectedZone(){
   if(!floorSelectedZoneId) return;
   floorPushUndo();
-  getCurrentFloor().zones=getCurrentFloor().zones.filter(z=>z.id!==floorSelectedZoneId);
+  floorMap.zones=floorMap.zones.filter(z=>z.id!==floorSelectedZoneId);
   floorSelectedZoneId=null; renderFloorMap();
 }
 function floorSaveLayout(){ persist(); toast('Floor map layout saved','s'); }
@@ -813,15 +810,13 @@ function closeFloorCardsPanel(){
 
 function renderFloorMap(){
   if(!floorMap) floorMap=defFloorMap();
-  renderFloorSwitcher();
-  const floor=getCurrentFloor();
   const svg=document.getElementById('floorMapSvg');
   const toolbar=document.getElementById('floorToolbar');
   toolbar.style.display=floorIsEditMode()?'flex':'none';
-  svg.setAttribute('viewBox',`0 0 ${floor.canvasWidth} ${floor.canvasHeight}`);
+  svg.setAttribute('viewBox',`0 0 ${floorMap.canvasWidth} ${floorMap.canvasHeight}`);
   svg.innerHTML='';
 
-  floor.zones.forEach(z=>{
+  floorMap.zones.forEach(z=>{
     const g=document.createElementNS('http://www.w3.org/2000/svg','g');
     g.setAttribute('class','fm-zone-group');
     g.dataset.id=z.id;
@@ -901,7 +896,7 @@ function renderFloorCards(rows){
 }
 function renderFloorLegend(){
   const el=document.getElementById('floorLegend');
-  const depts=[...new Set(getCurrentFloor().zones.map(z=>z.department).filter(d=>d&&d!=='None'))];
+  const depts=[...new Set(floorMap.zones.map(z=>z.department).filter(d=>d&&d!=='None'))];
   el.innerHTML=depts.map(d=>`<div><span style="background:${floorColorForZone({department:d,colorOverride:null})}"></span>${escHtml(d)}</div>`).join('');
 }
 function renderFloorZoneProps(){
