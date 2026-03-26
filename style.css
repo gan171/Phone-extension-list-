@@ -720,16 +720,27 @@ mark.hl{background:rgba(251,191,36,.35);color:inherit;border-radius:2px;padding:
 
 /* FLOOR MAP */
 .floor-tab-pane{display:flex;flex-direction:column;gap:.7rem}
+.floor-switcher-wrap{display:flex;gap:.45rem;flex-wrap:wrap}
+.floor-sw-btn{border:1px solid var(--border);background:var(--surface);color:var(--muted);padding:.36rem .75rem;border-radius:999px;cursor:pointer;font-size:.76rem}
+.floor-sw-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
 .floor-toolbar{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
 .floor-map-wrap{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--sh);height:58vh;min-height:360px;overflow:hidden}
 #floorMapSvg{width:100%;height:100%;display:block;background:var(--surface2)}
 .floor-legend{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.8);border:1px solid var(--border);padding:.4rem .55rem;border-radius:10px;font-size:.7rem}
 .floor-legend div{display:flex;align-items:center;gap:.35rem;margin:.15rem 0}
 .floor-legend span{width:10px;height:10px;border-radius:2px;display:inline-block}
+.fm-legend-title{font-weight:700;margin-bottom:.2rem}
 .zone-prop-panel{position:absolute;left:10px;top:10px;width:260px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.55rem;z-index:4}
+.zone-prop-close{position:absolute;top:4px;right:6px;background:transparent;border:none;color:var(--muted);cursor:pointer}
+.bay-config-panel{margin-top:.5rem;padding:.45rem;border:1px dashed var(--border);border-radius:8px;background:var(--surface2)}
+.bay-config-title,.bay-sections-title{font-size:.72rem;color:var(--muted);font-weight:700;display:flex;justify-content:space-between;align-items:center}
+.bay-sec-row{display:flex;gap:.25rem;align-items:center;margin:.25rem 0}
+.fm-seat-popover{position:absolute;z-index:6;background:var(--surface);border:1px solid var(--border);box-shadow:var(--sh);border-radius:10px;padding:.45rem;min-width:220px}
+.fm-seat-popover label{display:block;font-size:.66rem;color:var(--muted);margin-bottom:.2rem}
 .floor-cards-panel{position:relative;max-height:0;overflow:hidden;transition:max-height .28s ease,opacity .28s ease;opacity:0;background:var(--surface);border:1px solid var(--border);border-radius:12px}
 .floor-cards-panel.open{max-height:42vh;opacity:1;padding:.7rem}
 .floor-cards-close{position:absolute;right:8px;top:6px;background:transparent;border:0;font-size:1.1rem;color:var(--muted);cursor:pointer}
 .floor-card-grid{padding-top:1rem;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
 .fm-zone-group{cursor:pointer}
 .fm-handle{cursor:nwse-resize}
+.seat-tag{display:inline-flex;align-items:center;gap:.2rem;font-size:.62rem;padding:.12rem .38rem;border-radius:999px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);margin:.25rem 0}
